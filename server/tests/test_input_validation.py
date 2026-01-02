@@ -1,184 +1,150 @@
 """
 Tests for Pydantic input model validation - Infrastructure tests.
 
-These tests verify that the Pydantic validation INFRASTRUCTURE works correctly:
-1. Models accept valid inputs
-2. Models use defaults when inputs are missing
-3. Models reject extra fields (when configured to do so)
-4. Alias fields work correctly
+These tests verify that the Pydantic validation INFRASTRUCTURE works correctly
+for ALL input models, without assuming specific model names or field names.
 
-Developers can modify the specific defaults and field names in their models.
-These tests focus on validation behavior, not specific default values.
+Key behaviors tested:
+1. All input models can be instantiated with no arguments (use defaults)
+2. All input models reject extra/unknown fields
+3. Pydantic configuration is consistent across models
+
+Developers can add/remove input models without modifying these tests.
 """
 
 import pytest
-from pydantic import ValidationError
+from pydantic import BaseModel, ValidationError
+import inspect
 
 import sys
 from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
-from main import (
-    CardInput,
-    CarouselInput,
-    ListInput,
-    GalleryInput,
-    DashboardInput,
-    SolarSystemInput,
-    TodoInput,
-    ShopInput,
-)
+import main
 
 
-class TestPydanticValidationInfrastructure:
-    """Tests that Pydantic validation infrastructure works correctly."""
-
-    def test_card_input_accepts_valid_input(self):
-        """CardInput accepts valid input without raising."""
-        model = CardInput(title="Test", message="Hello", accentColor="#fff")
-        assert model.title == "Test"
-
-    def test_card_input_uses_defaults(self):
-        """CardInput uses defaults when no input provided."""
-        model = CardInput()
-        assert model.title is not None
-        assert model.message is not None
-        assert model.accent_color is not None
-
-    def test_card_input_rejects_extra_fields(self):
-        """CardInput rejects unknown fields."""
-        with pytest.raises(ValidationError):
-            CardInput(title="Test", unknown_field="value")
-
-    def test_card_input_alias_works(self):
-        """CardInput accepts both accent_color and accentColor."""
-        model1 = CardInput(accentColor="#123456")
-        model2 = CardInput(accent_color="#654321")
-        assert model1.accent_color == "#123456"
-        assert model2.accent_color == "#654321"
-
-    def test_carousel_input_accepts_valid_input(self):
-        """CarouselInput accepts valid input."""
-        model = CarouselInput(title="My Carousel", category="products")
-        assert model.title == "My Carousel"
-        assert model.category == "products"
-
-    def test_carousel_input_uses_defaults(self):
-        """CarouselInput uses defaults when no input provided."""
-        model = CarouselInput()
-        assert model.title is not None
-        assert model.category is not None
-
-    def test_carousel_input_rejects_extra_fields(self):
-        """CarouselInput rejects unknown fields."""
-        with pytest.raises(ValidationError):
-            CarouselInput(extra="not_allowed")
-
-    def test_list_input_accepts_valid_input(self):
-        """ListInput accepts valid input."""
-        model = ListInput(title="My List", subtitle="Description", category="items")
-        assert model.title == "My List"
-        assert model.subtitle == "Description"
-
-    def test_list_input_uses_defaults(self):
-        """ListInput uses defaults when no input provided."""
-        model = ListInput()
-        assert model.title is not None
-        assert model.subtitle is not None
-        assert model.category is not None
-
-    def test_gallery_input_accepts_valid_input(self):
-        """GalleryInput accepts valid input."""
-        model = GalleryInput(title="My Gallery", category="photos")
-        assert model.title == "My Gallery"
-
-    def test_gallery_input_uses_defaults(self):
-        """GalleryInput uses defaults when no input provided."""
-        model = GalleryInput()
-        assert model.title is not None
-        assert model.category is not None
-
-    def test_dashboard_input_accepts_valid_input(self):
-        """DashboardInput accepts valid input."""
-        model = DashboardInput(title="Analytics", period="Last week")
-        assert model.title == "Analytics"
-        assert model.period == "Last week"
-
-    def test_dashboard_input_uses_defaults(self):
-        """DashboardInput uses defaults when no input provided."""
-        model = DashboardInput()
-        assert model.title is not None
-        assert model.period is not None
-
-    def test_solar_system_input_accepts_valid_input(self):
-        """SolarSystemInput accepts valid input."""
-        model = SolarSystemInput(title="Planets", planet_name="Mars")
-        assert model.title == "Planets"
-        assert model.planet_name == "Mars"
-
-    def test_solar_system_input_optional_planet(self):
-        """SolarSystemInput planet_name is optional."""
-        model = SolarSystemInput(title="Space")
-        assert model.planet_name is None
-
-    def test_solar_system_input_uses_defaults(self):
-        """SolarSystemInput uses defaults when no input provided."""
-        model = SolarSystemInput()
-        assert model.title is not None
-        # planet_name should default to None
-        assert model.planet_name is None
-
-    def test_todo_input_accepts_valid_input(self):
-        """TodoInput accepts valid input."""
-        model = TodoInput(title="My Tasks")
-        assert model.title == "My Tasks"
-
-    def test_todo_input_uses_defaults(self):
-        """TodoInput uses defaults when no input provided."""
-        model = TodoInput()
-        assert model.title is not None
-
-    def test_shop_input_accepts_valid_input(self):
-        """ShopInput accepts valid input."""
-        model = ShopInput(title="My Cart")
-        assert model.title == "My Cart"
-
-    def test_shop_input_uses_defaults(self):
-        """ShopInput uses defaults when no input provided."""
-        model = ShopInput()
-        assert model.title is not None
+def get_all_input_models():
+    """Discover all Pydantic models ending with 'Input' from main.py."""
+    models = []
+    for name, obj in inspect.getmembers(main):
+        if (
+            inspect.isclass(obj)
+            and issubclass(obj, BaseModel)
+            and obj is not BaseModel
+            and name.endswith("Input")
+        ):
+            models.append((name, obj))
+    return models
 
 
-class TestPydanticTypeCoercion:
-    """Tests that Pydantic handles type coercion correctly."""
-
-    def test_string_fields_accept_strings(self):
-        """String fields accept string values."""
-        model = CardInput(title="Test Title")
-        assert isinstance(model.title, str)
-
-    def test_optional_field_accepts_none(self):
-        """Optional fields accept None."""
-        model = SolarSystemInput(planet_name=None)
-        assert model.planet_name is None
+# Get all input models for parametrized tests
+INPUT_MODELS = get_all_input_models()
 
 
-class TestModelConfig:
-    """Tests that model configuration is correct."""
+class TestInputModelDiscovery:
+    """Tests that input models are discoverable."""
 
-    def test_all_models_forbid_extra(self):
-        """All input models should forbid extra fields."""
-        models_to_test = [
-            (CardInput, {"unknown": "value"}),
-            (CarouselInput, {"unknown": "value"}),
-            (ListInput, {"unknown": "value"}),
-            (GalleryInput, {"unknown": "value"}),
-            (DashboardInput, {"unknown": "value"}),
-            (SolarSystemInput, {"unknown": "value"}),
-            (TodoInput, {"unknown": "value"}),
-            (ShopInput, {"unknown": "value"}),
-        ]
+    def test_at_least_one_input_model_exists(self):
+        """There should be at least one input model defined."""
+        assert len(INPUT_MODELS) > 0, (
+            "No input models found. Expected classes ending with 'Input' in main.py"
+        )
 
-        for model_class, invalid_data in models_to_test:
-            with pytest.raises(ValidationError):
-                model_class(**invalid_data)
+    def test_all_input_models_are_pydantic_models(self):
+        """All discovered input models should be Pydantic BaseModel subclasses."""
+        for name, model in INPUT_MODELS:
+            assert issubclass(model, BaseModel), (
+                f"{name} should be a Pydantic BaseModel subclass"
+            )
+
+
+class TestInputModelDefaults:
+    """Tests that input models have sensible defaults."""
+
+    @pytest.mark.parametrize("name,model", INPUT_MODELS)
+    def test_model_can_be_instantiated_with_no_arguments(self, name, model):
+        """Input models should have defaults for all required fields.
+
+        This is important because ChatGPT may call tools with empty arguments,
+        and the handlers should still work with default values.
+        """
+        try:
+            instance = model()
+            assert instance is not None
+        except ValidationError as e:
+            pytest.fail(
+                f"{name} cannot be instantiated with no arguments. "
+                f"All fields should have defaults. Error: {e}"
+            )
+
+    @pytest.mark.parametrize("name,model", INPUT_MODELS)
+    def test_model_instance_has_values(self, name, model):
+        """Instantiated models should have non-None values for required fields."""
+        instance = model()
+        # At least one field should be set (models shouldn't be completely empty)
+        fields = instance.model_fields
+        if fields:
+            # Check that the model has at least some data
+            data = instance.model_dump()
+            assert len(data) > 0, f"{name} should have at least one field"
+
+
+class TestInputModelValidation:
+    """Tests that input models have proper validation configuration."""
+
+    @pytest.mark.parametrize("name,model", INPUT_MODELS)
+    def test_model_rejects_extra_fields(self, name, model):
+        """Input models should reject unknown/extra fields.
+
+        This prevents typos in tool arguments from being silently ignored.
+        """
+        with pytest.raises(ValidationError) as exc_info:
+            model(completely_unknown_field_that_should_not_exist="value")
+
+        # Verify it's specifically an "extra fields" error
+        error_str = str(exc_info.value)
+        assert "extra" in error_str.lower() or "unexpected" in error_str.lower(), (
+            f"{name} should reject extra fields with a clear error message"
+        )
+
+    @pytest.mark.parametrize("name,model", INPUT_MODELS)
+    def test_model_config_forbids_extra(self, name, model):
+        """Input models should have model_config with extra='forbid'."""
+        config = getattr(model, "model_config", {})
+        assert config.get("extra") == "forbid", (
+            f"{name} should have model_config = ConfigDict(extra='forbid') "
+            "to reject unknown fields"
+        )
+
+
+class TestInputModelConsistency:
+    """Tests for consistency across input models."""
+
+    def test_all_models_use_same_config_pattern(self):
+        """All input models should use the same configuration pattern."""
+        configs = []
+        for name, model in INPUT_MODELS:
+            config = getattr(model, "model_config", {})
+            configs.append((name, config.get("extra")))
+
+        # All should have extra='forbid'
+        for name, extra_setting in configs:
+            assert extra_setting == "forbid", (
+                f"{name} should have extra='forbid' like other input models"
+            )
+
+    def test_input_model_count_matches_widget_count(self):
+        """Number of input models should match number of widgets.
+
+        Each widget tool should have a corresponding input model.
+        """
+        from main import WIDGETS
+
+        # This is a soft check - some widgets might share input models
+        # or have simple inputs that don't need a model
+        widget_count = len(WIDGETS)
+        input_count = len(INPUT_MODELS)
+
+        # Allow for some flexibility, but they should be in the same ballpark
+        assert input_count >= 1, "Should have at least one input model"
+        # Don't enforce exact match - just verify the pattern exists

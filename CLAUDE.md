@@ -60,7 +60,7 @@ pnpm run dev
 **IMPORTANT: Always run tests after modifying code (server or UI).**
 
 ```bash
-# Run all tests (server + UI) - 297 tests total
+# Run all tests (server + UI) - 272 tests total
 pnpm run test
 
 # Run only server tests
@@ -74,8 +74,7 @@ pnpm run test:cov
 ```
 
 ### Server Tests (Python - `server/tests/`)
-- **Input validation** - Pydantic models work correctly
-- **Tool handlers** - Return correct `structuredContent` structure
+- **Input validation** - All input models (discovered dynamically) work correctly
 - **Widget loading** - HTML loads from assets directory
 - **MCP protocol** - list_tools, list_resources, call_tool work
 - **OpenAI compliance** - Responses match OpenAI Apps SDK format requirements

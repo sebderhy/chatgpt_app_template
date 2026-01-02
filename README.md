@@ -141,7 +141,7 @@ Try them by asking ChatGPT: *"Show me the carousel"*, *"Show me the dashboard"*,
 
 ## Testing
 
-This template includes a comprehensive test suite (297 tests) to verify your app works correctly **before** testing in ChatGPT. This saves time by catching issues locally instead of going through the tedious connect-to-ChatGPT cycle.
+This template includes a comprehensive test suite (272 tests) to verify your app works correctly **before** testing in ChatGPT. This saves time by catching issues locally instead of going through the tedious connect-to-ChatGPT cycle.
 
 ### Quick Start
 
@@ -168,8 +168,7 @@ pnpm run test:ui:watch  # Watch mode for development
 
 | Test File | What It Checks |
 |-----------|----------------|
-| `test_input_validation.py` | Pydantic models accept valid inputs, use defaults, reject unknown fields |
-| `test_tool_handlers.py` | Handlers return correct `structuredContent` structure, custom inputs pass through |
+| `test_input_validation.py` | All input models (discovered dynamically) accept valid inputs, use defaults, reject unknown fields |
 | `test_widget_loading.py` | Widget HTML loads from assets, fallback to hashed filenames works |
 | `test_mcp_endpoints.py` | MCP protocol (list_tools, list_resources, call_tool) works correctly |
 | `test_openai_compliance.py` | Responses comply with OpenAI Apps SDK format requirements |
