@@ -1,6 +1,6 @@
 # ChatGPT App Template
 
-A template for building ChatGPT Apps, designed to work seamlessly with AI coding agents like Claude Code.
+A template for building ChatGPT Apps, designed to be edited seamlessly with AI coding agents like Claude Code (CLAUDE.md file included).
 
 ## Why This Template?
 
