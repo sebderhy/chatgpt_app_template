@@ -23,6 +23,9 @@ ChatGPT → MCP Tool Call → Python Server → structuredContent + widget HTML
 # Build widgets (required before running server)
 pnpm run build
 
+# Run tests to verify server works correctly
+pnpm run test
+
 # Start Python MCP server (also serves widget assets)
 pnpm run server
 
@@ -44,6 +47,7 @@ pnpm run dev
 2. Add "my-widget" to `targets` array in `build-all.mts`
 3. Add corresponding tools in `server/main.py`
 4. Run `pnpm run build`
+5. Run `pnpm run test` to verify everything works
 
 ## Key Files to Modify
 
@@ -51,9 +55,39 @@ pnpm run dev
 - `server/main.py` - Tool definitions and handlers
 - `build-all.mts` - Add new widget targets
 
+## Testing
+
+**IMPORTANT: Always run tests after modifying server code.**
+
+```bash
+# Run all tests
+pnpm run test
+
+# Run tests with coverage
+pnpm run test:cov
+```
+
+The test suite verifies:
+- **Input validation** - Pydantic models work correctly
+- **Tool handlers** - Return correct `structuredContent` structure
+- **Widget loading** - HTML loads from assets directory
+- **MCP protocol** - list_tools, list_resources, call_tool work
+- **OpenAI compliance** - Responses match OpenAI Apps SDK format requirements
+
+### When to Run Tests
+
+Run `pnpm run test` after:
+1. Modifying any handler in `server/main.py`
+2. Adding or changing Pydantic input models
+3. Adding new widgets or tools
+4. Changing widget configurations
+
+The tests are infrastructure-focused and don't require modification when changing sample data or business logic.
+
 ## Important Notes
 
 - Always run `pnpm run build` before starting the Python server
+- Always run `pnpm run test` after modifying server code
 - Restart Python server after rebuilding (LRU cache)
 - Widget HTML must have `mimeType: "text/html+skybridge"`
 - Use `window.openai.*` for ChatGPT host communication
