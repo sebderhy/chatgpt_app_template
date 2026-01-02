@@ -141,7 +141,7 @@ Try them by asking ChatGPT: *"Show me the carousel"*, *"Show me the dashboard"*,
 
 ## Testing
 
-This template includes a comprehensive test suite (417 tests) to verify your app works correctly **before** testing in ChatGPT. This saves time by catching issues locally instead of going through the tedious connect-to-ChatGPT cycle.
+This template includes a comprehensive test suite (297 tests) to verify your app works correctly **before** testing in ChatGPT. This saves time by catching issues locally instead of going through the tedious connect-to-ChatGPT cycle.
 
 ### Quick Start
 
@@ -178,9 +178,9 @@ pnpm run test:ui:watch  # Watch mode for development
 
 | Test File | What It Checks |
 |-----------|----------------|
-| `widget-structure.test.ts` | Widget entry points use correct patterns (createRoot, App import, root element ID) |
+| `widget-structure.test.ts` | Entry points exist and target correct root element ID (required by build system) |
 | `hooks.test.tsx` | React hooks correctly read from and sync with `window.openai` |
-| `build-output.test.ts` | Build produces expected JS/CSS/HTML files with correct structure |
+| `build-output.test.ts` | Build produces expected files with correct asset references and URLs |
 | `openai-types.test.ts` | TypeScript types cover all required OpenAI globals and APIs |
 
 ### Why This Matters

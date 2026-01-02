@@ -1,14 +1,19 @@
 /**
  * Widget Structure Tests - Infrastructure tests for widget file organization.
  *
- * These tests verify that widgets follow the required structure patterns
- * without assuming anything about the widget's business logic.
+ * These tests verify that widgets follow the REQUIRED structure patterns
+ * enforced by the build system, without assuming anything about widget
+ * business logic or implementation details.
  *
  * Key requirements verified:
- * 1. Each widget has an entry point (index.tsx)
- * 2. Each widget has a main component (App.tsx)
- * 3. Entry points use React 18+ createRoot pattern
- * 4. Entry points target the correct root element ID
+ * 1. Each widget has an entry point (index.tsx) - required by build system
+ * 2. Entry points target the correct root element ID - required by generated HTML
+ * 3. Shared infrastructure files exist (hooks, types)
+ *
+ * NOT verified (developer choice):
+ * - Component naming (App.tsx vs MyWidget.tsx)
+ * - Rendering method (createRoot vs other)
+ * - Component export patterns
  */
 
 import { describe, it, expect } from "vitest";
@@ -55,83 +60,19 @@ describe("Widget File Structure", () => {
       const entryPath = path.join(srcDir, widget, "index.tsx");
       expect(fs.existsSync(entryPath)).toBe(true);
     });
-
-    it.each(widgets)("widget '%s' has App.tsx component", (widget) => {
-      const appPath = path.join(srcDir, widget, "App.tsx");
-      expect(fs.existsSync(appPath)).toBe(true);
-    });
   });
 
-  describe("entry point patterns", () => {
-    it.each(widgets)(
-      "widget '%s' entry point uses createRoot",
-      (widget) => {
-        const entryPath = path.join(srcDir, widget, "index.tsx");
-        const content = fs.readFileSync(entryPath, "utf-8");
-
-        // Should import createRoot from react-dom/client
-        expect(content).toMatch(/import\s+{[^}]*createRoot[^}]*}\s+from\s+["']react-dom\/client["']/);
-
-        // Should call createRoot
-        expect(content).toMatch(/createRoot\(/);
-      }
-    );
-
-    it.each(widgets)(
-      "widget '%s' entry point imports App component",
-      (widget) => {
-        const entryPath = path.join(srcDir, widget, "index.tsx");
-        const content = fs.readFileSync(entryPath, "utf-8");
-
-        // Should import App from ./App
-        expect(content).toMatch(/import\s+App\s+from\s+["']\.\/App["']/);
-      }
-    );
-
-    it.each(widgets)(
-      "widget '%s' entry point renders App component",
-      (widget) => {
-        const entryPath = path.join(srcDir, widget, "index.tsx");
-        const content = fs.readFileSync(entryPath, "utf-8");
-
-        // Should render <App /> or <App>
-        expect(content).toMatch(/<App\s*\/?>|\.render\(\s*<App/);
-      }
-    );
-
+  describe("entry point requirements", () => {
     it.each(widgets)(
       "widget '%s' targets correct root element ID",
       (widget) => {
         const entryPath = path.join(srcDir, widget, "index.tsx");
         const content = fs.readFileSync(entryPath, "utf-8");
 
-        // Should getElementById with widget-name-root
+        // The build system generates HTML with <div id="${name}-root">
+        // so entry points MUST target this ID
         const expectedId = `${widget}-root`;
         expect(content).toContain(`"${expectedId}"`);
-      }
-    );
-  });
-
-  describe("App component patterns", () => {
-    it.each(widgets)(
-      "widget '%s' App.tsx exports a component",
-      (widget) => {
-        const appPath = path.join(srcDir, widget, "App.tsx");
-        const content = fs.readFileSync(appPath, "utf-8");
-
-        // Should have a default export (function or const)
-        expect(content).toMatch(/export\s+default\s+(function\s+App|App)/);
-      }
-    );
-
-    it.each(widgets)(
-      "widget '%s' App.tsx returns JSX",
-      (widget) => {
-        const appPath = path.join(srcDir, widget, "App.tsx");
-        const content = fs.readFileSync(appPath, "utf-8");
-
-        // Should have return statement with JSX (opening tag)
-        expect(content).toMatch(/return\s*\(?[\s\S]*?</);
       }
     );
   });

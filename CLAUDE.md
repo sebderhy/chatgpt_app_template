@@ -60,7 +60,7 @@ pnpm run dev
 **IMPORTANT: Always run tests after modifying code (server or UI).**
 
 ```bash
-# Run all tests (server + UI) - 417 tests total
+# Run all tests (server + UI) - 297 tests total
 pnpm run test
 
 # Run only server tests
@@ -81,9 +81,9 @@ pnpm run test:cov
 - **OpenAI compliance** - Responses match OpenAI Apps SDK format requirements
 
 ### UI Tests (Vitest - `tests/`)
-- **Widget structure** - Entry points use createRoot, import App, target correct root element
+- **Widget structure** - Entry points exist, target correct root element ID
 - **React hooks** - Hooks read from and sync with `window.openai`
-- **Build output** - Build produces correct JS/CSS/HTML with proper structure
+- **Build output** - Build produces correct files with proper asset references
 - **OpenAI types** - TypeScript types cover all required globals and APIs
 
 ### When to Run Tests
