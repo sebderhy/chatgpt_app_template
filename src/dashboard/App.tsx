@@ -202,7 +202,14 @@ function ActivityItemComponent({ item, isDark }: { item: ActivityItem; isDark: b
 }
 
 export default function App() {
-  const props = useWidgetProps<ToolOutput>(defaultProps);
+  const rawProps = useWidgetProps<Partial<ToolOutput>>(defaultProps);
+  // Merge with defaults to ensure all required fields exist
+  const props: ToolOutput = {
+    ...defaultProps,
+    ...rawProps,
+    stats: rawProps?.stats ?? defaultProps.stats,
+    activities: rawProps?.activities ?? defaultProps.activities,
+  };
   const theme = useTheme() ?? "light";
   const displayMode = useDisplayMode() ?? "inline";
   const isDark = theme === "dark";

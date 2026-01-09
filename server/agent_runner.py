@@ -88,6 +88,7 @@ async def create_mcp_server() -> MCPServerStreamableHttp:
             "url": MCP_SERVER_URL,
         },
         cache_tools_list=True,  # Cache tools for better performance
+        use_structured_content=True,  # Get structuredContent from MCP responses
     )
 
 
@@ -176,49 +177,65 @@ async def run_agent(
 
         # Extract widget data from tool calls
         widget_result = None
+        last_tool_name = None
 
-        # Debug: print all items to understand structure
+        # Process all items to find tool calls and their outputs
         for item in result.new_items:
             # Check for MCP tool call items
             item_type = type(item).__name__
 
-            # Look for tool calls and their outputs
-            if hasattr(item, 'raw_item'):
+            # Handle different item types
+            # ToolCallItem - captures the tool name
+            if item_type == 'ToolCallItem' and hasattr(item, 'raw_item'):
                 raw = item.raw_item
-                raw_type = getattr(raw, 'type', None)
+                if hasattr(raw, 'name'):
+                    last_tool_name = raw.name
 
-                # Function call (tool invocation)
-                if raw_type == 'function_call':
-                    tool_name = getattr(raw, 'name', '')
-                    tool_args_str = getattr(raw, 'arguments', '{}')
-                    try:
-                        tool_args = json.loads(tool_args_str) if tool_args_str else {}
-                    except json.JSONDecodeError:
-                        tool_args = {}
+            # ToolCallOutputItem - captures the tool output
+            elif item_type == 'ToolCallOutputItem':
+                tool_name = last_tool_name or ''
+                html = get_widget_html(tool_name) if tool_name else ''
 
-                    # Get widget HTML
-                    html = get_widget_html(tool_name)
-                    if html:
-                        widget_result = WidgetResult(
-                            tool_name=tool_name,
-                            html=html,
-                            tool_output=tool_args,
-                            text_summary=f"Displaying {tool_name}"
-                        )
+                if html:
+                    # Extract output from the item
+                    tool_output = {}
 
-                # Function call output (tool result)
-                elif raw_type == 'function_call_output':
-                    output = getattr(raw, 'output', '')
-                    # Try to parse the output as JSON to get structured content
-                    if output and widget_result:
-                        try:
-                            parsed = json.loads(output)
-                            # MCP returns structuredContent in the response
-                            if isinstance(parsed, dict):
-                                # The output might contain the structured content directly
-                                widget_result.tool_output = parsed
-                        except (json.JSONDecodeError, TypeError):
-                            pass
+                    # The output might be in different places depending on SDK version
+                    if hasattr(item, 'output'):
+                        output = item.output
+                    elif hasattr(item, 'raw_item'):
+                        raw = item.raw_item
+                        if isinstance(raw, dict):
+                            output = raw.get('output', raw)
+                        else:
+                            output = getattr(raw, 'output', None)
+                    else:
+                        output = None
+
+                    # Parse the output
+                    if output:
+                        if isinstance(output, str):
+                            try:
+                                parsed = json.loads(output)
+                                if isinstance(parsed, dict):
+                                    if 'structuredContent' in parsed:
+                                        tool_output = parsed['structuredContent']
+                                    else:
+                                        tool_output = parsed
+                            except (json.JSONDecodeError, TypeError):
+                                pass
+                        elif isinstance(output, dict):
+                            if 'structuredContent' in output:
+                                tool_output = output['structuredContent']
+                            else:
+                                tool_output = output
+
+                    widget_result = WidgetResult(
+                        tool_name=tool_name,
+                        html=html,
+                        tool_output=tool_output,
+                        text_summary=f"Displaying {tool_name}"
+                    )
 
         # Update conversation history
         conversation_manager.add_message(conversation_id, "user", prompt)
