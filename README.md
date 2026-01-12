@@ -169,10 +169,10 @@ The AI receives your prompt, decides which widget to show, and the tool captures
 
 **2. Direct Mode (no API key)** - Test specific widgets directly:
 ```bash
-pnpm run ui-test --widget carousel
-pnpm run ui-test --widget dashboard
+pnpm run ui-test --widget carousel      # Calls show_carousel (adds show_ prefix)
+pnpm run ui-test --tool my_custom_tool  # Calls exact tool name (no prefix)
 ```
-Renders the widget without AI, useful for quick smoke tests.
+Use `--widget` for standard `show_*` tools, or `--tool` for tools with custom naming conventions.
 
 ### Output
 

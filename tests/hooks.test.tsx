@@ -186,16 +186,15 @@ describe("useWidgetProps", () => {
 
 describe("useWidgetState", () => {
   describe("initialization", () => {
-    it("syncs with window.openai.widgetState (null when not set)", () => {
-      // When widgetState is not set on window, hook syncs to null
-      // This is the expected behavior - the hook stays in sync with the host
-      const { result } = renderHook(() =>
-        useWidgetState({ count: 0, selected: null })
-      );
+    it("preserves default state when window.openai.widgetState is null", () => {
+      // When widgetState is not set on window, hook should preserve the default state
+      // This allows widgets to function correctly in the simulator and tests
+      const defaultState = { count: 0, selected: null };
+      const { result } = renderHook(() => useWidgetState(defaultState));
 
       const [state] = result.current;
-      // After sync with window, state is null (no saved state on host)
-      expect(state).toBeNull();
+      // Default state is preserved when window state is null
+      expect(state).toEqual(defaultState);
     });
 
     it("uses widgetState from window when available", () => {

@@ -99,17 +99,23 @@ async function hasApiKey(): Promise<boolean> {
   }
 }
 
-// Get available widgets
-async function getAvailableWidgets(): Promise<string[]> {
+// Get available tools (returns full tool names)
+async function getAvailableTools(): Promise<string[]> {
   try {
     const response = await fetch(`http://localhost:${SERVER_PORT}/tools`);
     const data = await response.json();
-    return (data.tools || []).map((t: { function: { name: string } }) =>
-      t.function.name.replace("show_", "")
-    );
+    return (data.tools || []).map((t: { function: { name: string } }) => t.function.name);
   } catch {
     return [];
   }
+}
+
+// Get available widgets (for backwards compatibility, strips show_ prefix)
+async function getAvailableWidgets(): Promise<string[]> {
+  const tools = await getAvailableTools();
+  return tools
+    .filter((name) => name.startsWith("show_"))
+    .map((name) => name.replace("show_", ""));
 }
 
 // Start the server
@@ -277,18 +283,20 @@ async function runAITest(prompt: string, interactive: boolean): Promise<TestResu
   }
 }
 
-// Direct widget test - no API key needed
-async function runDirectWidgetTest(widgetName: string): Promise<TestResult> {
+// Direct widget/tool test - no API key needed
+// toolName can be either a widget name (will add show_ prefix) or an exact tool name
+async function runDirectWidgetTest(toolName: string, isExactToolName: boolean = false): Promise<TestResult> {
   const { chromium } = await import("@playwright/test");
 
-  log(`\nDirect widget test: ${widgetName}`, "blue");
+  const actualToolName = isExactToolName ? toolName : `show_${toolName}`;
+  log(`\nDirect tool test: ${actualToolName}`, "blue");
 
   // First, call the tool directly to get widget HTML
   log("Calling tool endpoint...", "blue");
   const toolResponse = await fetch(`http://localhost:${SERVER_PORT}/tools/call`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ name: `show_${widgetName}`, arguments: {} }),
+    body: JSON.stringify({ name: actualToolName, arguments: {} }),
   });
 
   const toolData = await toolResponse.json();
@@ -340,7 +348,7 @@ async function runDirectWidgetTest(widgetName: string): Promise<TestResult> {
     const testHtml = `<!DOCTYPE html>
 <html>
 <head>
-  <title>Widget Test: ${widgetName}</title>
+  <title>Widget Test: ${actualToolName}</title>
   <style>
     body { margin: 0; padding: 20px; font-family: system-ui, sans-serif; background: #f5f5f5; }
     h1 { margin: 0 0 20px 0; font-size: 18px; color: #333; }
@@ -349,7 +357,7 @@ async function runDirectWidgetTest(widgetName: string): Promise<TestResult> {
   </style>
 </head>
 <body>
-  <h1>Widget: ${widgetName}</h1>
+  <h1>Tool: ${actualToolName}</h1>
   <div class="widget-container">
     <iframe id="widget-frame" title="Widget"></iframe>
   </div>
@@ -380,11 +388,11 @@ async function runDirectWidgetTest(widgetName: string): Promise<TestResult> {
 
     const domSnapshot = {
       userMessages: [],
-      assistantMessages: [`Direct widget test: ${widgetName}`],
+      assistantMessages: [`Direct tool test: ${actualToolName}`],
       widgetCount: hasWidget ? 1 : 0,
       hasWidget,
       isLoading: false,
-      widgetName,
+      toolName: actualToolName,
       toolOutput: toolData.tool_output,
       timestamp: new Date().toISOString(),
     };
@@ -402,7 +410,7 @@ async function runDirectWidgetTest(widgetName: string): Promise<TestResult> {
       hasWidget,
       isLoading: false,
       userMessages: [],
-      assistantMessages: [`Direct widget test: ${widgetName}`],
+      assistantMessages: [`Direct tool test: ${actualToolName}`],
       widgetCount: hasWidget ? 1 : 0,
       screenshotPath,
       domPath,
@@ -448,40 +456,57 @@ function printResults(result: TestResult, mode: string, prompt: string) {
 async function main() {
   const args = process.argv.slice(2);
   const interactive = args.includes("--interactive") || args.includes("-i");
+
+  // Parse --widget flag (adds show_ prefix)
   const widgetArg = args.find((a) => a.startsWith("--widget=") || a.startsWith("-w="));
   const widgetFlag = args.includes("--widget") || args.includes("-w");
   const widgetIndex = args.findIndex((a) => a === "--widget" || a === "-w");
 
+  // Parse --tool flag (exact tool name, no prefix added)
+  const toolArg = args.find((a) => a.startsWith("--tool=") || a.startsWith("-t="));
+  const toolFlag = args.includes("--tool") || args.includes("-t");
+  const toolIndex = args.findIndex((a) => a === "--tool" || a === "-t");
+
   let widgetName: string | null = null;
+  let exactToolName: string | null = null;
+
   if (widgetArg) {
     widgetName = widgetArg.split("=")[1];
-  } else if (widgetFlag && widgetIndex !== -1 && args[widgetIndex + 1]) {
+  } else if (widgetFlag && widgetIndex !== -1 && args[widgetIndex + 1] && !args[widgetIndex + 1].startsWith("-")) {
     widgetName = args[widgetIndex + 1];
   }
 
+  if (toolArg) {
+    exactToolName = toolArg.split("=")[1];
+  } else if (toolFlag && toolIndex !== -1 && args[toolIndex + 1] && !args[toolIndex + 1].startsWith("-")) {
+    exactToolName = args[toolIndex + 1];
+  }
+
   const prompt = args
-    .filter((arg) => !arg.startsWith("-") && arg !== widgetName)
+    .filter((arg) => !arg.startsWith("-") && arg !== widgetName && arg !== exactToolName)
     .join(" ");
 
   // Show help if no arguments
-  if (!prompt && !widgetName && !interactive) {
+  if (!prompt && !widgetName && !exactToolName && !interactive) {
     log("🧪 UI Test Tool for AI Agents", "cyan");
     log("\nUsage:", "reset");
     log('  pnpm run ui-test "Your prompt here"     # AI mode (needs API key)', "green");
-    log("  pnpm run ui-test --widget carousel      # Direct widget test (no API key)", "green");
+    log("  pnpm run ui-test --widget carousel      # Widget test (adds show_ prefix)", "green");
+    log("  pnpm run ui-test --tool my_custom_tool  # Exact tool name (no prefix)", "green");
     log("  pnpm run ui-test --interactive          # Open browser for manual testing", "green");
     log("\nExamples:", "reset");
     log('  pnpm run ui-test "Show me the carousel widget"', "reset");
-    log("  pnpm run ui-test --widget dashboard", "reset");
-    log("  pnpm run ui-test -w todo", "reset");
-    log("\nAvailable widgets:", "reset");
+    log("  pnpm run ui-test --widget dashboard     # Calls show_dashboard", "reset");
+    log("  pnpm run ui-test --tool my_custom_tool  # Calls my_custom_tool exactly", "reset");
+    log("  pnpm run ui-test -t another_tool        # Short form for --tool", "reset");
+    log("\nAvailable tools:", "reset");
 
-    // Try to list widgets
+    // Try to list tools
     if (await isServerRunning()) {
-      const widgets = await getAvailableWidgets();
-      widgets.forEach((w) => log(`  - ${w}`, "reset"));
+      const tools = await getAvailableTools();
+      tools.forEach((t) => log(`  - ${t}`, "reset"));
     } else {
-      log("  (start server to see available widgets)", "yellow");
+      log("  (start server to see available tools)", "yellow");
     }
 
     log("\nRequirements:", "reset");
@@ -518,10 +543,14 @@ async function main() {
   try {
     let result: TestResult;
 
-    if (widgetName) {
-      // Direct widget test mode
-      result = await runDirectWidgetTest(widgetName);
-      printResults(result, "Direct Widget Test", widgetName);
+    if (exactToolName) {
+      // Direct tool test mode (exact tool name)
+      result = await runDirectWidgetTest(exactToolName, true);
+      printResults(result, "Direct Tool Test", exactToolName);
+    } else if (widgetName) {
+      // Direct widget test mode (adds show_ prefix)
+      result = await runDirectWidgetTest(widgetName, false);
+      printResults(result, "Direct Widget Test", `show_${widgetName}`);
     } else if (interactive) {
       // Interactive mode
       result = await runAITest("", true);
@@ -530,23 +559,23 @@ async function main() {
       // AI mode - check for API key
       const apiKeyAvailable = await hasApiKey();
       if (!apiKeyAvailable) {
-        log("⚠️  No OPENAI_API_KEY found. Using direct widget test instead.", "yellow");
+        log("⚠️  No OPENAI_API_KEY found. Using direct tool test instead.", "yellow");
         log("   For AI-powered testing, set OPENAI_API_KEY in .env\n", "yellow");
 
-        // Try to extract widget name from prompt
-        const widgets = await getAvailableWidgets();
-        const matchedWidget = widgets.find(
-          (w) => prompt.toLowerCase().includes(w.toLowerCase())
+        // Try to extract tool name from prompt
+        const tools = await getAvailableTools();
+        const matchedTool = tools.find(
+          (t) => prompt.toLowerCase().includes(t.toLowerCase())
         );
 
-        if (matchedWidget) {
-          result = await runDirectWidgetTest(matchedWidget);
-          printResults(result, "Direct Widget Test (fallback)", matchedWidget);
+        if (matchedTool) {
+          result = await runDirectWidgetTest(matchedTool, true);
+          printResults(result, "Direct Tool Test (fallback)", matchedTool);
         } else {
-          logError(`Could not determine widget from prompt: "${prompt}"`);
-          log("\nAvailable widgets:", "yellow");
-          widgets.forEach((w) => log(`  - ${w}`, "reset"));
-          log("\nUse: pnpm run ui-test --widget <name>", "yellow");
+          logError(`Could not determine tool from prompt: "${prompt}"`);
+          log("\nAvailable tools:", "yellow");
+          tools.forEach((t) => log(`  - ${t}`, "reset"));
+          log("\nUse: pnpm run ui-test --tool <name>", "yellow");
           process.exit(1);
         }
       } else {

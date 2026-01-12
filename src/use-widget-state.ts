@@ -34,7 +34,9 @@ export function useWidgetState<T extends UnknownObject>(
   });
 
   useEffect(() => {
-    _setWidgetState(widgetStateFromWindow);
+    if (widgetStateFromWindow != null) {
+      _setWidgetState(widgetStateFromWindow);
+    }
   }, [widgetStateFromWindow]);
 
   const setWidgetState = useCallback(

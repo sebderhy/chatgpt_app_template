@@ -87,10 +87,13 @@ pnpm run setup:test   # Downloads Playwright Chromium (~150MB)
 
 **Direct mode (no API key needed):**
 ```bash
-pnpm run ui-test --widget carousel    # Test carousel widget
-pnpm run ui-test --widget dashboard   # Test dashboard widget
-pnpm run ui-test --widget todo        # Test any widget by name
+pnpm run ui-test --widget carousel      # Calls show_carousel (adds show_ prefix)
+pnpm run ui-test --widget dashboard     # Calls show_dashboard
+pnpm run ui-test --tool my_custom_tool  # Calls exact tool name (no prefix)
+pnpm run ui-test -t another_tool        # Short form for --tool
 ```
+
+Use `--widget` for standard `show_*` tools. Use `--tool` for tools with custom naming conventions.
 
 **AI mode (requires OPENAI_API_KEY in .env):**
 ```bash
