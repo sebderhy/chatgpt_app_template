@@ -78,7 +78,23 @@ def create_widgets() -> List[Widget]:
         Widget(
             identifier="show_card",
             title="Show Card Widget",
-            description="Display an interactive card widget with items. Use this for simple interactive displays.",
+            description="""Display an interactive card widget with items.
+
+Use this tool when:
+- The user wants a simple, clean display of a few items
+- You need a basic interactive widget that doesn't fit other categories
+- Displaying a single entity with details and actions
+
+Args:
+    title: Widget header text (default: "Card Widget")
+    message: Main message displayed in the card (default: "Hello from the server!")
+    accentColor: Hex color for accent styling (default: "#2563eb")
+
+Returns:
+    Interactive card with title, message, accent color, and sample items list.
+
+Example:
+    show_card(title="Welcome", message="Click items below", accentColor="#10b981")""",
             template_uri="ui://widget/boilerplate.html",
             invoking="Loading card widget...",
             invoked="Card widget ready",
@@ -87,7 +103,27 @@ def create_widgets() -> List[Widget]:
         Widget(
             identifier="show_carousel",
             title="Show Carousel",
-            description="Display a horizontal carousel of cards. Perfect for showcasing places, products, or recommendations.",
+            description="""Display a horizontal carousel of cards for browsing multiple items.
+
+Use this tool when:
+- The user asks for recommendations (restaurants, hotels, products)
+- Showing a collection where users want to browse horizontally
+- Displaying options with images, ratings, and quick info
+
+Args:
+    title: Carousel header text (default: "Recommendations")
+    category: Category of items to display (default: "restaurants")
+
+Returns:
+    Horizontal scrolling carousel with cards containing:
+    - Image thumbnail
+    - Title and subtitle
+    - Rating (1-5 stars)
+    - Location and price level
+    - Optional badge (e.g., "Popular", "New")
+
+Example:
+    show_carousel(title="Top Restaurants Near You", category="restaurants")""",
             template_uri="ui://widget/carousel.html",
             invoking="Loading carousel...",
             invoked="Carousel ready",
@@ -96,7 +132,28 @@ def create_widgets() -> List[Widget]:
         Widget(
             identifier="show_list",
             title="Show List",
-            description="Display a vertical list with thumbnails. Great for rankings, search results, or task lists.",
+            description="""Display a vertical list with thumbnails and metadata.
+
+Use this tool when:
+- The user wants ranked/ordered content (top 10, best of, search results)
+- Showing items where order and comparison matter
+- Displaying task lists or sequential items
+
+Args:
+    title: List header text (default: "Top Picks")
+    subtitle: Secondary header text (default: "Curated recommendations")
+    category: Category of items to display (default: "restaurants")
+
+Returns:
+    Vertical scrolling list with items containing:
+    - Thumbnail image
+    - Title and subtitle
+    - Rating
+    - Metadata (location, etc.)
+    - Optional rank badge (#1, #2, etc.)
+
+Example:
+    show_list(title="Top 5 Coffee Shops", subtitle="Based on reviews", category="cafes")""",
             template_uri="ui://widget/list.html",
             invoking="Loading list...",
             invoked="List ready",
@@ -105,7 +162,26 @@ def create_widgets() -> List[Widget]:
         Widget(
             identifier="show_gallery",
             title="Show Gallery",
-            description="Display an image gallery with lightbox. Perfect for photo albums or visual showcases.",
+            description="""Display an image gallery with grid layout and lightbox viewer.
+
+Use this tool when:
+- The user wants to see photos or images
+- Displaying visual portfolios, albums, or collections
+- Images are the primary content (not just thumbnails)
+
+Args:
+    title: Gallery header text (default: "Photo Gallery")
+    category: Category of images to display (default: "nature")
+
+Returns:
+    Image grid with lightbox functionality containing:
+    - Thumbnail grid view
+    - Full-size lightbox on click
+    - Image title and description
+    - Author attribution
+
+Example:
+    show_gallery(title="Nature Photography", category="nature")""",
             template_uri="ui://widget/gallery.html",
             invoking="Loading gallery...",
             invoked="Gallery ready",
@@ -114,7 +190,25 @@ def create_widgets() -> List[Widget]:
         Widget(
             identifier="show_dashboard",
             title="Show Dashboard",
-            description="Display a dashboard with stats and metrics. Ideal for analytics, KPIs, or account overviews.",
+            description="""Display a dashboard with stats, metrics, and activity feed.
+
+Use this tool when:
+- The user wants to see analytics or KPIs
+- Showing account overview or status information
+- Displaying numerical data with trends
+
+Args:
+    title: Dashboard header text (default: "Dashboard")
+    period: Time period label (default: "Last 30 days")
+
+Returns:
+    Dashboard layout with:
+    - Stat cards (value, change percentage, icon)
+    - Activity feed (recent events with timestamps)
+    - Period selector display
+
+Example:
+    show_dashboard(title="Sales Overview", period="This month")""",
             template_uri="ui://widget/dashboard.html",
             invoking="Loading dashboard...",
             invoked="Dashboard ready",
@@ -123,7 +217,25 @@ def create_widgets() -> List[Widget]:
         Widget(
             identifier="show_solar_system",
             title="Show Solar System",
-            description="Display an interactive 3D solar system. Click on planets to learn about them. Great for educational content.",
+            description="""Display an interactive 3D solar system visualization.
+
+Use this tool when:
+- The user asks about planets, astronomy, or the solar system
+- Educational content about space
+- Interactive learning experiences
+
+Args:
+    title: Widget header text (default: "Solar System Explorer")
+    planet_name: Optional planet to focus on (Mercury, Venus, Earth, Mars, Jupiter, Saturn, Uranus, Neptune)
+
+Returns:
+    Interactive 3D visualization with:
+    - Animated planet orbits
+    - Clickable planets with info panels
+    - Planet details (size, distance, facts)
+
+Example:
+    show_solar_system(title="Explore the Planets", planet_name="Mars")""",
             template_uri="ui://widget/solar-system.html",
             invoking="Loading solar system...",
             invoked="Solar system ready",
@@ -132,7 +244,26 @@ def create_widgets() -> List[Widget]:
         Widget(
             identifier="show_todo",
             title="Show Todo List",
-            description="Display an interactive todo list with multiple lists, drag-and-drop reordering, and due dates.",
+            description="""Display an interactive todo list manager with multiple lists.
+
+Use this tool when:
+- The user wants to organize tasks or create a todo list
+- Managing multiple lists (work, personal, shopping)
+- Tracking task completion and due dates
+
+Args:
+    title: Main title text (default: "My Tasks")
+
+Returns:
+    Todo manager interface with:
+    - Multiple collapsible lists
+    - Drag-and-drop reordering
+    - Task completion checkboxes
+    - Due date display
+    - Add/edit/delete functionality
+
+Example:
+    show_todo(title="Today's Tasks")""",
             template_uri="ui://widget/todo.html",
             invoking="Loading todo list...",
             invoked="Todo list ready",
@@ -141,7 +272,26 @@ def create_widgets() -> List[Widget]:
         Widget(
             identifier="show_shop",
             title="Show Shopping Cart",
-            description="Display a shopping cart with products, quantities, and checkout flow. Perfect for e-commerce.",
+            description="""Display a shopping cart with products and checkout flow.
+
+Use this tool when:
+- The user wants to manage a shopping cart
+- E-commerce checkout experiences
+- Product quantity and price management
+
+Args:
+    title: Cart header text (default: "Your Cart")
+
+Returns:
+    Shopping cart interface with:
+    - Product list with images and descriptions
+    - Quantity controls (+/-)
+    - Price calculations
+    - Product tags (vegan, spicy, etc.)
+    - Checkout button
+
+Example:
+    show_shop(title="Your Shopping Cart")""",
             template_uri="ui://widget/shop.html",
             invoking="Loading shopping cart...",
             invoked="Shopping cart ready",
@@ -354,7 +504,49 @@ SAMPLE_CART_ITEMS = [
 # MCP SERVER SETUP
 # =============================================================================
 
-mcp = FastMCP(name="boilerplate-server", stateless_http=True)
+SERVER_INSTRUCTIONS = """
+## ChatGPT Widget Server Usage Guide
+
+This MCP server provides interactive widget tools for ChatGPT. Each tool displays
+a specific type of visual content in the chat interface.
+
+### Tool Selection Guide
+
+Choose the right tool based on user intent:
+
+- **show_carousel**: Best for showcasing multiple items horizontally (restaurants,
+  products, places). Use when the user asks for recommendations or wants to browse options.
+
+- **show_list**: Best for ranked/ordered content (top 10 lists, search results,
+  task lists). Use when order matters or items need detailed metadata.
+
+- **show_gallery**: Best for image-focused content (photo albums, portfolios).
+  Use when visuals are the primary content.
+
+- **show_dashboard**: Best for metrics and analytics (KPIs, account overviews,
+  stats). Use when showing numerical data or status information.
+
+- **show_card**: Basic interactive widget. Use for simple single-item displays
+  or when other widgets don't fit.
+
+- **show_solar_system**: Educational 3D visualization. Use for astronomy topics
+  or interactive learning experiences.
+
+- **show_todo**: Task management interface. Use when the user wants to organize
+  tasks, create lists, or track progress.
+
+- **show_shop**: E-commerce cart interface. Use for shopping, checkout flows,
+  or product quantity management.
+
+### Important Notes
+
+- All widgets support both light and dark themes automatically
+- Widgets are responsive and work on mobile and desktop
+- Each tool returns sample data by default - in production, connect to real data sources
+- Use the `title` parameter to customize the widget header
+"""
+
+mcp = FastMCP(name="boilerplate-server", instructions=SERVER_INSTRUCTIONS, stateless_http=True)
 
 
 def get_tool_meta(widget: Widget) -> Dict[str, Any]:
@@ -378,18 +570,51 @@ def get_invocation_meta(widget: Widget) -> Dict[str, Any]:
 # TOOL REGISTRATION
 # =============================================================================
 
+# Map widget identifiers to their input models for proper schema generation
+WIDGET_INPUT_MODELS: Dict[str, type] = {
+    "show_card": CardInput,
+    "show_carousel": CarouselInput,
+    "show_list": ListInput,
+    "show_gallery": GalleryInput,
+    "show_dashboard": DashboardInput,
+    "show_solar_system": SolarSystemInput,
+    "show_todo": TodoInput,
+    "show_shop": ShopInput,
+}
+
+
+def get_tool_schema(widget_id: str) -> Dict[str, Any]:
+    """Generate JSON Schema from the Pydantic model for a widget."""
+    model_class = WIDGET_INPUT_MODELS.get(widget_id)
+    if not model_class:
+        return {"type": "object", "properties": {}, "additionalProperties": False}
+
+    # Generate schema from Pydantic model
+    pydantic_schema = model_class.model_json_schema()
+
+    # Convert to MCP-compatible format (remove $defs and other extras)
+    properties = {}
+    for field_name, field_info in pydantic_schema.get("properties", {}).items():
+        prop = {"type": field_info.get("type", "string")}
+        if "description" in field_info:
+            prop["description"] = field_info["description"]
+        if "default" in field_info:
+            prop["default"] = field_info["default"]
+        properties[field_name] = prop
+
+    return {
+        "type": "object",
+        "properties": properties,
+        "additionalProperties": False,
+    }
+
+
 @mcp._mcp_server.list_tools()
 async def list_tools() -> List[types.Tool]:
     tools = []
 
     for widget in WIDGETS:
-        schema = {
-            "type": "object",
-            "properties": {
-                "title": {"type": "string", "description": "Widget title"},
-            },
-            "additionalProperties": True,
-        }
+        schema = get_tool_schema(widget.identifier)
 
         tools.append(types.Tool(
             name=widget.identifier,
@@ -490,11 +715,33 @@ async def handle_call_tool(req: types.CallToolRequest) -> types.ServerResult:
         ))
 
 
+def format_validation_error(e: ValidationError, input_class: type) -> str:
+    """Format Pydantic validation errors into actionable messages."""
+    errors = e.errors()
+    field_errors = []
+    for err in errors:
+        field = ".".join(str(x) for x in err["loc"]) if err["loc"] else "input"
+        msg = err["msg"]
+        field_errors.append(f"  - {field}: {msg}")
+
+    # Get valid field names from the model
+    valid_fields = list(input_class.model_fields.keys())
+
+    error_msg = f"Validation error. Issues:\n"
+    error_msg += "\n".join(field_errors)
+    error_msg += f"\n\nValid fields: {', '.join(valid_fields)}"
+    return error_msg
+
+
 async def handle_card(widget: Widget, arguments: Dict[str, Any]) -> types.ServerResult:
     try:
         payload = CardInput.model_validate(arguments)
     except ValidationError as e:
-        payload = CardInput()
+        error_msg = format_validation_error(e, CardInput)
+        return types.ServerResult(types.CallToolResult(
+            content=[types.TextContent(type="text", text=error_msg)],
+            isError=True,
+        ))
 
     structured_content = {
         "title": payload.title,
@@ -517,8 +764,12 @@ async def handle_card(widget: Widget, arguments: Dict[str, Any]) -> types.Server
 async def handle_carousel(widget: Widget, arguments: Dict[str, Any]) -> types.ServerResult:
     try:
         payload = CarouselInput.model_validate(arguments)
-    except ValidationError:
-        payload = CarouselInput()
+    except ValidationError as e:
+        error_msg = format_validation_error(e, CarouselInput)
+        return types.ServerResult(types.CallToolResult(
+            content=[types.TextContent(type="text", text=error_msg)],
+            isError=True,
+        ))
 
     structured_content = {
         "title": payload.title,
@@ -535,8 +786,12 @@ async def handle_carousel(widget: Widget, arguments: Dict[str, Any]) -> types.Se
 async def handle_list(widget: Widget, arguments: Dict[str, Any]) -> types.ServerResult:
     try:
         payload = ListInput.model_validate(arguments)
-    except ValidationError:
-        payload = ListInput()
+    except ValidationError as e:
+        error_msg = format_validation_error(e, ListInput)
+        return types.ServerResult(types.CallToolResult(
+            content=[types.TextContent(type="text", text=error_msg)],
+            isError=True,
+        ))
 
     structured_content = {
         "title": payload.title,
@@ -556,8 +811,12 @@ async def handle_list(widget: Widget, arguments: Dict[str, Any]) -> types.Server
 async def handle_gallery(widget: Widget, arguments: Dict[str, Any]) -> types.ServerResult:
     try:
         payload = GalleryInput.model_validate(arguments)
-    except ValidationError:
-        payload = GalleryInput()
+    except ValidationError as e:
+        error_msg = format_validation_error(e, GalleryInput)
+        return types.ServerResult(types.CallToolResult(
+            content=[types.TextContent(type="text", text=error_msg)],
+            isError=True,
+        ))
 
     structured_content = {
         "title": payload.title,
@@ -574,8 +833,12 @@ async def handle_gallery(widget: Widget, arguments: Dict[str, Any]) -> types.Ser
 async def handle_dashboard(widget: Widget, arguments: Dict[str, Any]) -> types.ServerResult:
     try:
         payload = DashboardInput.model_validate(arguments)
-    except ValidationError:
-        payload = DashboardInput()
+    except ValidationError as e:
+        error_msg = format_validation_error(e, DashboardInput)
+        return types.ServerResult(types.CallToolResult(
+            content=[types.TextContent(type="text", text=error_msg)],
+            isError=True,
+        ))
 
     structured_content = {
         "title": payload.title,
@@ -595,8 +858,12 @@ async def handle_dashboard(widget: Widget, arguments: Dict[str, Any]) -> types.S
 async def handle_solar_system(widget: Widget, arguments: Dict[str, Any]) -> types.ServerResult:
     try:
         payload = SolarSystemInput.model_validate(arguments)
-    except ValidationError:
-        payload = SolarSystemInput()
+    except ValidationError as e:
+        error_msg = format_validation_error(e, SolarSystemInput)
+        return types.ServerResult(types.CallToolResult(
+            content=[types.TextContent(type="text", text=error_msg)],
+            isError=True,
+        ))
 
     structured_content = {
         "title": payload.title,
@@ -614,8 +881,12 @@ async def handle_solar_system(widget: Widget, arguments: Dict[str, Any]) -> type
 async def handle_todo(widget: Widget, arguments: Dict[str, Any]) -> types.ServerResult:
     try:
         payload = TodoInput.model_validate(arguments)
-    except ValidationError:
-        payload = TodoInput()
+    except ValidationError as e:
+        error_msg = format_validation_error(e, TodoInput)
+        return types.ServerResult(types.CallToolResult(
+            content=[types.TextContent(type="text", text=error_msg)],
+            isError=True,
+        ))
 
     structured_content = {
         "lists": deepcopy(SAMPLE_TODO_LISTS),
@@ -632,8 +903,12 @@ async def handle_todo(widget: Widget, arguments: Dict[str, Any]) -> types.Server
 async def handle_shop(widget: Widget, arguments: Dict[str, Any]) -> types.ServerResult:
     try:
         payload = ShopInput.model_validate(arguments)
-    except ValidationError:
-        payload = ShopInput()
+    except ValidationError as e:
+        error_msg = format_validation_error(e, ShopInput)
+        return types.ServerResult(types.CallToolResult(
+            content=[types.TextContent(type="text", text=error_msg)],
+            isError=True,
+        ))
 
     structured_content = {
         "title": payload.title,
