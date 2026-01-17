@@ -52,7 +52,3 @@ pnpm run build && pnpm run server
 ```
 
 No API key required - uses Puter.js fallback for testing.
-
-## Premium Guide
-
-**For detailed patterns, examples, and advanced workflows, read `premium/building-guide.md`**
