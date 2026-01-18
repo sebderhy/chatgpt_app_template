@@ -9,9 +9,10 @@ A template for building ChatGPT Apps, designed to be edited seamlessly with AI c
 1. **Zero-config testing** - Simulator works instantly with no API key (free for dev/testing via [Puter.js](https://puter.com))
 2. **Automated UI testing** - AI agents can test widgets visually using Playwright screenshots
 3. **Coding Agent Onboarding** - `CLAUDE.md` explains the codebase, so AI agents know where things are
-4. **Orthogonal test suite** - 282 tests that pass regardless of what app you build
-5. **Local ChatGPT Simulator** - Test widgets locally without deploying to ChatGPT
-6. **Working examples** - 8 widget examples to learn from or build upon
+4. **MCP best practices** - Built following [MCP server guidelines](docs/mcp-server-guidelines-for-ai-agents.md) for tool naming, descriptions, and error handling
+5. **Orthogonal test suite** - 282 tests that pass regardless of what app you build
+6. **Local ChatGPT Simulator** - Test widgets locally without deploying to ChatGPT
+7. **Working examples** - 8 widget examples to learn from or build upon
 
 The tests verify *infrastructure*, not business logic. When you (or your AI agent) modify widgets, add features, or change data - the tests still pass. Run `pnpm run test` anytime to verify everything works, without connecting to ChatGPT.
 
@@ -129,9 +130,11 @@ Try them: *"Show me the carousel"*, *"Show me the dashboard"*, etc.
 
 1. Create `src/my-widget/index.tsx` (entry point must target `my-widget-root`)
 2. Add `"my-widget"` to the `targets` array in `build-all.mts`
-3. Add a tool handler in `server/main.py`
+3. Add a tool handler in `server/main.py` following the [MCP server guidelines](docs/mcp-server-guidelines-for-ai-agents.md)
 4. Run `pnpm run build && pnpm run test`
 5. Test in the simulator: `http://localhost:8000/assets/simulator.html`
+
+When customizing this template for your own app, follow the guidelines in [`docs/mcp-server-guidelines-for-ai-agents.md`](docs/mcp-server-guidelines-for-ai-agents.md) for tool naming conventions, descriptions, and error handling best practices.
 
 ## Testing
 

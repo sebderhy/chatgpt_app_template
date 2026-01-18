@@ -34,6 +34,7 @@ pnpm run ui-test --widget <name>  # Visual test a widget
 
 Read these before building:
 
+- `docs/building-guide.md` - Detailed patterns, examples, and advanced workflows
 - `docs/mcp-server-guidelines-for-ai-agents.md` - MCP best practices (tool naming, descriptions, error handling)
 - `docs/openai_apps_sdk_docs.md` - OpenAI Apps SDK (display modes, UX guidelines)
 
