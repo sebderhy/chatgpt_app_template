@@ -181,6 +181,9 @@ for (const name of builtNames) {
   const html = `<!doctype html>
 <html>
 <head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>${name === "simulator" ? "ChatGPT Widget Simulator" : name}</title>
   <script type="module" src="./${name}-${h}.js"></script>
   <link rel="stylesheet" href="./${name}-${h}.css">
 </head>

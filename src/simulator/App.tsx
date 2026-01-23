@@ -433,14 +433,14 @@ After calling a tool, provide a brief helpful response about what you're showing
     <div className={`h-screen flex flex-col ${isDark ? "bg-gray-900" : "bg-gray-50"}`}>
       {/* Header */}
       <header
-        className={`px-4 py-3 border-b flex items-center justify-between ${
+        className={`px-3 sm:px-4 py-2 sm:py-3 border-b flex items-center justify-between gap-2 ${
           isDark ? "border-gray-700 bg-gray-900" : "border-gray-200 bg-white"
         }`}
       >
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-2 sm:gap-3 min-w-0">
           <button
             onClick={newConversation}
-            className={`p-2 rounded-lg transition-colors ${
+            className={`p-2 rounded-lg transition-colors flex-shrink-0 ${
               isDark
                 ? "hover:bg-gray-800 text-gray-400 hover:text-white"
                 : "hover:bg-gray-100 text-gray-600 hover:text-gray-900"
@@ -449,12 +449,12 @@ After calling a tool, provide a brief helpful response about what you're showing
           >
             <Plus size={20} />
           </button>
-          <div>
-            <h1 className={`text-lg font-semibold ${isDark ? "text-white" : "text-gray-900"}`}>
-              ChatGPT Simulator
+          <div className="min-w-0">
+            <h1 className={`text-base sm:text-lg font-semibold truncate ${isDark ? "text-white" : "text-gray-900"}`}>
+              <span className="hidden sm:inline">ChatGPT </span>Simulator
             </h1>
-            {/* Mode indicator */}
-            <div className="flex items-center gap-1.5">
+            {/* Mode indicator - hidden on very small screens */}
+            <div className="hidden xs:flex items-center gap-1.5">
               <span
                 className={`text-xs ${
                   agentMode === "puter"
@@ -469,7 +469,8 @@ After calling a tool, provide a brief helpful response about what you're showing
                 ) : agentMode === "puter" ? (
                   <span className="flex items-center gap-1">
                     <Zap size={12} />
-                    Puter.js (free, no API key)
+                    <span className="hidden sm:inline">Puter.js (free, no API key)</span>
+                    <span className="sm:hidden">Puter.js</span>
                   </span>
                 ) : (
                   "OpenAI API"
@@ -478,7 +479,7 @@ After calling a tool, provide a brief helpful response about what you're showing
             </div>
           </div>
         </div>
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-1 sm:gap-2 flex-shrink-0">
           {/* Mode toggle */}
           <div
             className={`flex rounded-lg border p-0.5 ${
@@ -487,7 +488,7 @@ After calling a tool, provide a brief helpful response about what you're showing
           >
             <button
               onClick={() => setInteractionMode("chat")}
-              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-md text-sm transition-colors ${
+              className={`flex items-center gap-1 sm:gap-1.5 px-2 sm:px-3 py-1.5 rounded-md text-sm transition-colors ${
                 interactionMode === "chat"
                   ? isDark
                     ? "bg-gray-700 text-white"
@@ -499,11 +500,11 @@ After calling a tool, provide a brief helpful response about what you're showing
               title="Chat with AI"
             >
               <MessageSquare size={16} />
-              Chat
+              <span className="hidden sm:inline">Chat</span>
             </button>
             <button
               onClick={() => setInteractionMode("direct")}
-              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-md text-sm transition-colors ${
+              className={`flex items-center gap-1 sm:gap-1.5 px-2 sm:px-3 py-1.5 rounded-md text-sm transition-colors ${
                 interactionMode === "direct"
                   ? isDark
                     ? "bg-gray-700 text-white"
@@ -515,7 +516,7 @@ After calling a tool, provide a brief helpful response about what you're showing
               title="Invoke tools directly"
             >
               <Wrench size={16} />
-              Direct
+              <span className="hidden sm:inline">Direct</span>
             </button>
           </div>
           <button
@@ -534,8 +535,8 @@ After calling a tool, provide a brief helpful response about what you're showing
       <div className="flex-1 overflow-y-auto">
         {interactionMode === "direct" ? (
           /* Direct Tool Mode */
-          <div className="max-w-4xl mx-auto px-4 py-6">
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          <div className="max-w-4xl mx-auto px-3 sm:px-4 py-4 sm:py-6">
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-6">
               {/* Tool Selection Panel */}
               <div
                 className={`lg:col-span-1 rounded-2xl border p-4 ${
@@ -655,7 +656,7 @@ After calling a tool, provide a brief helpful response about what you're showing
                         <Maximize2 size={16} />
                       </button>
                     </div>
-                    <div className="h-[500px]">
+                    <div className="h-[300px] sm:h-[500px]">
                       <WidgetRenderer
                         html={directWidget.html}
                         toolOutput={directWidget.toolOutput}
@@ -665,7 +666,7 @@ After calling a tool, provide a brief helpful response about what you're showing
                     </div>
                   </>
                 ) : (
-                  <div className="h-[500px] flex items-center justify-center">
+                  <div className="h-[300px] sm:h-[500px] flex items-center justify-center">
                     <div className="text-center">
                       <Wrench
                         size={48}
@@ -682,26 +683,26 @@ After calling a tool, provide a brief helpful response about what you're showing
           </div>
         ) : (
           /* Chat Mode */
-          <div className="max-w-3xl mx-auto px-4 py-6 space-y-6">
+          <div className="max-w-3xl mx-auto px-3 sm:px-4 py-4 sm:py-6 space-y-4 sm:space-y-6">
             {messages.length === 0 && (
-              <div className="text-center py-12">
-                <h2 className={`text-2xl font-semibold mb-2 ${isDark ? "text-white" : "text-gray-900"}`}>
-                  ChatGPT Widget Simulator
+              <div className="text-center py-8 sm:py-12 px-2">
+                <h2 className={`text-xl sm:text-2xl font-semibold mb-2 ${isDark ? "text-white" : "text-gray-900"}`}>
+                  <span className="hidden sm:inline">ChatGPT </span>Widget Simulator
                 </h2>
                 <p className={`text-sm mb-2 ${isDark ? "text-gray-400" : "text-gray-500"}`}>
-                  Test your widgets locally before deploying to ChatGPT
+                  Test your widgets locally before deploying
                 </p>
                 {agentMode === "puter" && (
-                  <p className={`text-xs mb-6 ${isDark ? "text-green-400" : "text-green-600"}`}>
+                  <p className={`text-xs mb-4 sm:mb-6 ${isDark ? "text-green-400" : "text-green-600"}`}>
                     Using Puter.js - no API key required!
                   </p>
                 )}
-                <div className="flex flex-wrap justify-center gap-2">
+                <div className="flex flex-wrap justify-center gap-2 max-w-md mx-auto">
                   {EXAMPLE_PROMPTS.map((prompt) => (
                     <button
                       key={prompt}
                       onClick={() => sendMessage(prompt)}
-                      className={`px-4 py-2 text-sm rounded-full transition-colors ${
+                      className={`px-3 sm:px-4 py-1.5 sm:py-2 text-xs sm:text-sm rounded-full transition-colors ${
                         isDark
                           ? "bg-gray-800 hover:bg-gray-700 text-gray-300 border border-gray-700"
                           : "bg-white hover:bg-gray-50 text-gray-700 border border-gray-200"
@@ -808,9 +809,9 @@ After calling a tool, provide a brief helpful response about what you're showing
       {/* Input Area - only show in chat mode */}
       {interactionMode === "chat" && (
       <div className={`border-t ${isDark ? "border-gray-700 bg-gray-900" : "border-gray-200 bg-white"}`}>
-        <div className="max-w-3xl mx-auto px-4 py-4">
+        <div className="max-w-3xl mx-auto px-3 sm:px-4 py-3 sm:py-4">
           <div
-            className={`flex items-center gap-3 rounded-2xl border px-4 py-2 ${
+            className={`flex items-center gap-2 sm:gap-3 rounded-2xl border px-3 sm:px-4 py-2 ${
               isDark ? "bg-gray-800 border-gray-700" : "bg-white border-gray-200"
             }`}
           >
@@ -851,9 +852,9 @@ After calling a tool, provide a brief helpful response about what you're showing
 
       {/* Fullscreen Widget Modal */}
       {expandedWidget && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-2 sm:p-4">
           <div
-            className={`w-full h-full max-w-4xl max-h-[90vh] m-4 rounded-2xl overflow-hidden flex flex-col ${
+            className={`w-full h-full max-w-4xl max-h-[95vh] sm:max-h-[90vh] rounded-xl sm:rounded-2xl overflow-hidden flex flex-col ${
               isDark ? "bg-gray-900" : "bg-white"
             }`}
           >
