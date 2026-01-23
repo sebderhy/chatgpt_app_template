@@ -63,4 +63,4 @@ When running on a VPS or accessing via public IP, set `BASE_URL`:
 BASE_URL=http://YOUR_IP:8000/assets pnpm run server
 ```
 
-Or use a `.env` file in the `server/` directory (see `server/.env.example`).
+Or use a `.env` file at the repo root (see `.env.example`).

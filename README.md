@@ -251,9 +251,9 @@ pnpm run build
 # Set BASE_URL when starting the server
 BASE_URL=http://YOUR_SERVER_IP:8000/assets pnpm run server
 
-# Or use a .env file in the server directory
-cp server/.env.example server/.env
-# Edit server/.env and set BASE_URL=http://YOUR_SERVER_IP:8000/assets
+# Or use a .env file at the repo root
+cp .env.example .env
+# Edit .env and set BASE_URL=http://YOUR_SERVER_IP:8000/assets
 ```
 
 The server replaces the `__BASE_URL__` placeholder at runtime, so you can rebuild once and deploy anywhere by just changing the environment variable.
