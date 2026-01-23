@@ -53,3 +53,13 @@ pnpm run build && pnpm run server
 ```
 
 No API key required - uses Puter.js fallback for testing.
+
+## VPS / Remote Deployment
+
+When running on a VPS or accessing via public IP, set `BASE_URL`:
+
+```bash
+BASE_URL=http://YOUR_IP:8000/assets pnpm run server
+```
+
+Or use a `.env` file in the `server/` directory (see `server/.env.example`).

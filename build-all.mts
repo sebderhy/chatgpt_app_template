@@ -163,21 +163,26 @@ console.groupEnd();
 
 console.log("new hash: ", h);
 
-const defaultBaseUrl = "http://localhost:8000/assets";
+// HTML files use relative paths (just filename) which work for:
+// 1. Static files loaded in browser (resolved relative to /assets/)
+// 2. MCP responses - server prepends BASE_URL for absolute URLs in srcdoc iframes
 const baseUrlCandidate = process.env.BASE_URL?.trim() ?? "";
-const baseUrlRaw = baseUrlCandidate.length > 0 ? baseUrlCandidate : defaultBaseUrl;
-const normalizedBaseUrl = baseUrlRaw.replace(/\/+$/, "") || defaultBaseUrl;
-console.log(`Using BASE_URL ${normalizedBaseUrl} for generated HTML`);
+if (baseUrlCandidate) {
+  console.log(`BASE_URL set to ${baseUrlCandidate} (will be used by server at runtime)`);
+} else {
+  console.log("No BASE_URL set - using relative paths (server will add absolute URLs for MCP)");
+}
 
 for (const name of builtNames) {
   const dir = outDir;
   const hashedHtmlPath = path.join(dir, `${name}-${h}.html`);
   const liveHtmlPath = path.join(dir, `${name}.html`);
+  // Use relative paths - browser resolves them, server adds absolute URL for MCP
   const html = `<!doctype html>
 <html>
 <head>
-  <script type="module" src="${normalizedBaseUrl}/${name}-${h}.js"></script>
-  <link rel="stylesheet" href="${normalizedBaseUrl}/${name}-${h}.css">
+  <script type="module" src="./${name}-${h}.js"></script>
+  <link rel="stylesheet" href="./${name}-${h}.css">
 </head>
 <body>
   <div id="${name}-root"></div>

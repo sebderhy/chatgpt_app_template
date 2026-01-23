@@ -162,14 +162,14 @@ describe.skipIf(!buildExists)("HTML Asset References", () => {
   });
 
   describe("asset URLs", () => {
-    it.each(widgets)("widget '%s' HTML uses absolute URLs for assets", (widget) => {
+    it.each(widgets)("widget '%s' HTML has valid asset URLs", (widget) => {
       const htmlPath = path.join(assetsDir, `${widget}.html`);
       const content = fs.readFileSync(htmlPath, "utf-8");
 
-      // Should have a full URL in script/link tags (not relative)
-      // Default is http://localhost:8000/assets or custom BASE_URL
-      expect(content).toMatch(/src="https?:\/\//);
-      expect(content).toMatch(/href="https?:\/\//);
+      // Should have either relative paths (./) or absolute URLs (https?://)
+      // Default build uses relative paths; server converts to absolute for MCP responses
+      expect(content).toMatch(/src="(\.\/|https?:\/\/)/);
+      expect(content).toMatch(/href="(\.\/|https?:\/\/)/);
     });
   });
 });

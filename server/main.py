@@ -16,9 +16,9 @@ Run with: uvicorn main:app --host 0.0.0.0 --port 8000 --reload
 
 from __future__ import annotations
 
+import os
 from copy import deepcopy
 from dataclasses import dataclass
-from functools import lru_cache
 from pathlib import Path
 from typing import Any, Dict, List, Optional
 
@@ -51,21 +51,59 @@ MIME_TYPE = "text/html+skybridge"
 # WIDGET HTML LOADING
 # =============================================================================
 
-@lru_cache(maxsize=None)
+_DEFAULT_BASE_URL = "http://localhost:8000/assets"
+
+# Cache for loaded HTML with resolved URLs (keyed by component name)
+_html_cache: Dict[str, str] = {}
+
+
+def _clear_html_cache() -> None:
+    """Clear the HTML cache. Used by tests."""
+    _html_cache.clear()
+
+
+def get_base_url() -> str:
+    """Get the base URL for assets from environment or use default."""
+    return os.environ.get("BASE_URL", _DEFAULT_BASE_URL).rstrip("/")
+
+
 def load_widget_html(component_name: str) -> str:
-    """Load the built widget HTML from the assets directory."""
+    """Load the built widget HTML from the assets directory.
+
+    Converts relative paths (./) to absolute URLs using BASE_URL env var.
+    This is needed because widget HTML is injected into iframes via srcdoc,
+    where relative paths don't resolve correctly.
+
+    Results are cached per component name.
+    """
+    if component_name in _html_cache:
+        return _html_cache[component_name]
+
     html_path = ASSETS_DIR / f"{component_name}.html"
     if html_path.exists():
-        return html_path.read_text(encoding="utf8")
+        html = html_path.read_text(encoding="utf8")
+    else:
+        fallback_candidates = sorted(ASSETS_DIR.glob(f"{component_name}-*.html"))
+        if fallback_candidates:
+            html = fallback_candidates[-1].read_text(encoding="utf8")
+        else:
+            raise FileNotFoundError(
+                f'Widget HTML for "{component_name}" not found in {ASSETS_DIR}. '
+                "Run `pnpm run build` from the repo root to generate the assets."
+            )
 
-    fallback_candidates = sorted(ASSETS_DIR.glob(f"{component_name}-*.html"))
-    if fallback_candidates:
-        return fallback_candidates[-1].read_text(encoding="utf8")
+    # Convert relative paths to absolute URLs for srcdoc iframe compatibility
+    # HTML files use "./" prefix which works for static serving but not srcdoc
+    base_url = get_base_url()
+    html = html.replace('src="./', f'src="{base_url}/')
+    html = html.replace('href="./', f'href="{base_url}/')
 
-    raise FileNotFoundError(
-        f'Widget HTML for "{component_name}" not found in {ASSETS_DIR}. '
-        "Run `pnpm run build` from the repo root to generate the assets."
-    )
+    _html_cache[component_name] = html
+    return html
+
+
+# Add cache_clear method for test compatibility (mimics lru_cache interface)
+load_widget_html.cache_clear = _clear_html_cache  # type: ignore[attr-defined]
 
 
 # =============================================================================

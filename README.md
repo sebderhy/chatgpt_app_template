@@ -221,8 +221,38 @@ await window.openai.callTool("my_tool", { arg: "value" });
 
 ## Deployment
 
+### Local Development
+
+No configuration needed - just run:
 ```bash
-BASE_URL=https://your-domain.com pnpm run build
+pnpm run build
+pnpm run server
+```
+
+### VPS / Remote Server
+
+When running on a VPS or remote server, set the `BASE_URL` environment variable so widgets load correctly:
+
+```bash
+# Build once (no BASE_URL needed - uses placeholder)
+pnpm run build
+
+# Set BASE_URL when starting the server
+BASE_URL=http://YOUR_SERVER_IP:8000/assets pnpm run server
+
+# Or use a .env file in the server directory
+cp server/.env.example server/.env
+# Edit server/.env and set BASE_URL=http://YOUR_SERVER_IP:8000/assets
+```
+
+The server replaces the `__BASE_URL__` placeholder at runtime, so you can rebuild once and deploy anywhere by just changing the environment variable.
+
+### Production
+
+For production with a domain and HTTPS:
+
+```bash
+BASE_URL=https://your-domain.com/assets pnpm run server
 ```
 
 Deploy the Python server to any platform (Fly.io, Render, Railway, Cloud Run, etc.). Requirements: HTTPS, `/mcp` endpoint, SSE streaming support.

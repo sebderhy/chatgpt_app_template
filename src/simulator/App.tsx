@@ -81,6 +81,14 @@ const EXAMPLE_PROMPTS = [
 
 const PUTER_MODEL = "gpt-4o-mini"; // Free model via Puter.js
 
+// UUID generator with fallback for non-secure contexts (HTTP on public IP)
+function uid(): string {
+  if (typeof crypto !== "undefined" && crypto.randomUUID) {
+    return uid();
+  }
+  return (Date.now().toString(36) + Math.random().toString(36).slice(2, 10)).toUpperCase();
+}
+
 export default function App() {
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState("");
@@ -279,7 +287,7 @@ After calling a tool, provide a brief helpful response about what you're showing
     if (!text.trim() || loading || agentMode === "checking") return;
 
     const userMessage: Message = {
-      id: crypto.randomUUID(),
+      id: uid(),
       role: "user",
       content: text,
       timestamp: new Date(),
@@ -295,7 +303,7 @@ After calling a tool, provide a brief helpful response about what you're showing
         : await sendMessageBackend(text);
 
       const assistantMessage: Message = {
-        id: crypto.randomUUID(),
+        id: uid(),
         role: "assistant",
         content: result.message,
         widget: result.widget,
@@ -305,7 +313,7 @@ After calling a tool, provide a brief helpful response about what you're showing
       setMessages((prev) => [...prev, assistantMessage]);
     } catch (error) {
       const errorMessage: Message = {
-        id: crypto.randomUUID(),
+        id: uid(),
         role: "error",
         content: error instanceof Error ? error.message : "An error occurred",
         timestamp: new Date(),
