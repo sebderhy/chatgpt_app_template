@@ -297,6 +297,37 @@ Example:
             invoked="Shopping cart ready",
             html=load_widget_html("shop"),
         ),
+        Widget(
+            identifier="show_travel_map",
+            title="Show Travel Map",
+            description="""Display an interactive map with places of interest - TripAdvisor style.
+
+Use this tool when:
+- The user asks about places to visit in a city or area
+- Showing hotels, restaurants, attractions on a map
+- Travel planning and destination exploration
+- Displaying multiple points of interest with locations
+
+Args:
+    title: Map header text (default: "Explore the Area")
+    subtitle: Secondary text (default: "Top-rated places near you")
+    location: City or area name (default: "San Francisco")
+
+Returns:
+    Interactive map widget with:
+    - Color-coded markers for different categories (restaurants, hotels, attractions, cafes, shops)
+    - Clickable markers showing place details
+    - Place cards with ratings, reviews, price levels
+    - Horizontal scrollable list of all places
+    - Category legend
+
+Example:
+    show_travel_map(title="Top Places in Paris", subtitle="Must-visit spots", location="Paris")""",
+            template_uri="ui://widget/travel-map.html",
+            invoking="Loading travel map...",
+            invoked="Travel map ready",
+            html=load_widget_html("travel-map"),
+        ),
     ]
 
 
@@ -369,6 +400,14 @@ class TodoInput(BaseModel):
 class ShopInput(BaseModel):
     """Input for shop widget."""
     title: str = Field(default="Your Cart", description="Cart title")
+    model_config = ConfigDict(populate_by_name=True, extra="forbid")
+
+
+class TravelMapInput(BaseModel):
+    """Input for travel map widget."""
+    title: str = Field(default="Explore the Area", description="Map title")
+    subtitle: str = Field(default="Top-rated places near you", description="Map subtitle")
+    location: str = Field(default="San Francisco", description="City or area to display")
     model_config = ConfigDict(populate_by_name=True, extra="forbid")
 
 
@@ -499,6 +538,90 @@ SAMPLE_CART_ITEMS = [
     },
 ]
 
+SAMPLE_MAP_PLACES = [
+    {
+        "id": "1",
+        "name": "Golden Gate Bistro",
+        "category": "restaurant",
+        "description": "Award-winning modern American cuisine with stunning bay views",
+        "image": "https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?w=400&h=300&fit=crop",
+        "rating": 4.8,
+        "reviewCount": 2847,
+        "priceLevel": "$$$",
+        "address": "123 Marina Blvd, San Francisco",
+        "lat": 37.8024,
+        "lng": -122.4058,
+        "tags": ["Fine Dining", "Waterfront"],
+    },
+    {
+        "id": "2",
+        "name": "The Fairmont",
+        "category": "hotel",
+        "description": "Historic luxury hotel atop Nob Hill with panoramic city views",
+        "image": "https://images.unsplash.com/photo-1566073771259-6a8506099945?w=400&h=300&fit=crop",
+        "rating": 4.7,
+        "reviewCount": 5234,
+        "priceLevel": "$$$$",
+        "address": "950 Mason St, San Francisco",
+        "lat": 37.7922,
+        "lng": -122.4100,
+        "tags": ["Luxury", "Historic"],
+    },
+    {
+        "id": "3",
+        "name": "Alcatraz Island",
+        "category": "attraction",
+        "description": "Iconic former federal prison with guided tours and bay views",
+        "image": "https://images.unsplash.com/photo-1534050359320-02900022671e?w=400&h=300&fit=crop",
+        "rating": 4.9,
+        "reviewCount": 18432,
+        "address": "Alcatraz Island, San Francisco Bay",
+        "lat": 37.8267,
+        "lng": -122.4230,
+        "tags": ["Historic", "Must See"],
+    },
+    {
+        "id": "4",
+        "name": "Blue Bottle Coffee",
+        "category": "cafe",
+        "description": "Artisan coffee roasters known for pour-over and espresso",
+        "image": "https://images.unsplash.com/photo-1495474472287-4d71bcdd2085?w=400&h=300&fit=crop",
+        "rating": 4.5,
+        "reviewCount": 1256,
+        "priceLevel": "$$",
+        "address": "66 Mint St, San Francisco",
+        "lat": 37.7825,
+        "lng": -122.4024,
+        "tags": ["Local Favorite"],
+    },
+    {
+        "id": "5",
+        "name": "Ferry Building Marketplace",
+        "category": "shop",
+        "description": "Historic waterfront marketplace with local artisan vendors",
+        "image": "https://images.unsplash.com/photo-1555529669-e69e7aa0ba9a?w=400&h=300&fit=crop",
+        "rating": 4.6,
+        "reviewCount": 8921,
+        "address": "1 Ferry Building, San Francisco",
+        "lat": 37.7956,
+        "lng": -122.3935,
+        "tags": ["Shopping", "Food Hall"],
+    },
+    {
+        "id": "6",
+        "name": "Fisherman's Wharf",
+        "category": "attraction",
+        "description": "Bustling waterfront neighborhood with seafood and sea lions",
+        "image": "https://images.unsplash.com/photo-1534430480872-3498386e7856?w=400&h=300&fit=crop",
+        "rating": 4.4,
+        "reviewCount": 12543,
+        "address": "Jefferson St, San Francisco",
+        "lat": 37.8080,
+        "lng": -122.4177,
+        "tags": ["Family Friendly", "Iconic"],
+    },
+]
+
 
 # =============================================================================
 # MCP SERVER SETUP
@@ -580,6 +703,7 @@ WIDGET_INPUT_MODELS: Dict[str, type] = {
     "show_solar_system": SolarSystemInput,
     "show_todo": TodoInput,
     "show_shop": ShopInput,
+    "show_travel_map": TravelMapInput,
 }
 
 
@@ -708,6 +832,8 @@ async def handle_call_tool(req: types.CallToolRequest) -> types.ServerResult:
         return await handle_todo(widget, arguments)
     elif tool_name == "show_shop":
         return await handle_shop(widget, arguments)
+    elif tool_name == "show_travel_map":
+        return await handle_travel_map(widget, arguments)
     else:
         return types.ServerResult(types.CallToolResult(
             content=[types.TextContent(type="text", text=f"No handler for: {tool_name}")],
@@ -918,6 +1044,31 @@ async def handle_shop(widget: Widget, arguments: Dict[str, Any]) -> types.Server
     total_items = sum(item["quantity"] for item in SAMPLE_CART_ITEMS)
     return types.ServerResult(types.CallToolResult(
         content=[types.TextContent(type="text", text=f"Shopping Cart: {total_items} items")],
+        structuredContent=structured_content,
+        _meta=get_invocation_meta(widget),
+    ))
+
+
+async def handle_travel_map(widget: Widget, arguments: Dict[str, Any]) -> types.ServerResult:
+    try:
+        payload = TravelMapInput.model_validate(arguments)
+    except ValidationError as e:
+        error_msg = format_validation_error(e, TravelMapInput)
+        return types.ServerResult(types.CallToolResult(
+            content=[types.TextContent(type="text", text=error_msg)],
+            isError=True,
+        ))
+
+    structured_content = {
+        "title": payload.title,
+        "subtitle": payload.subtitle,
+        "places": deepcopy(SAMPLE_MAP_PLACES),
+        "center": {"lat": 37.7949, "lng": -122.4094},
+        "zoom": 13,
+    }
+
+    return types.ServerResult(types.CallToolResult(
+        content=[types.TextContent(type="text", text=f"Travel Map: {payload.title} ({len(SAMPLE_MAP_PLACES)} places)")],
         structuredContent=structured_content,
         _meta=get_invocation_meta(widget),
     ))

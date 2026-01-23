@@ -7,7 +7,7 @@
  */
 
 import { useState, useRef, useEffect, useCallback } from "react";
-import { Send, Plus, Sun, Moon, Maximize2, X, Zap } from "lucide-react";
+import { Send, Plus, Sun, Moon, Maximize2, X, Zap, Play, MessageSquare, Wrench } from "lucide-react";
 import WidgetRenderer from "./WidgetRenderer";
 
 // Puter.js types
@@ -68,6 +68,7 @@ interface Message {
 }
 
 type AgentMode = "checking" | "backend" | "puter";
+type InteractionMode = "chat" | "direct";
 
 const EXAMPLE_PROMPTS = [
   "Show me a carousel of restaurants",
@@ -89,6 +90,12 @@ export default function App() {
   const [agentMode, setAgentMode] = useState<AgentMode>("checking");
   const [tools, setTools] = useState<Tool[]>([]);
 
+  // Direct tool mode state
+  const [interactionMode, setInteractionMode] = useState<InteractionMode>("chat");
+  const [selectedTool, setSelectedTool] = useState<string>("");
+  const [toolArgs, setToolArgs] = useState<Record<string, string>>({});
+  const [directWidget, setDirectWidget] = useState<WidgetData | null>(null);
+
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
 
@@ -96,6 +103,11 @@ export default function App() {
   useEffect(() => {
     const init = async () => {
       try {
+        // Always load tool definitions (needed for direct mode)
+        const toolsRes = await fetch("/tools");
+        const toolsData = await toolsRes.json();
+        setTools(toolsData.tools || []);
+
         // Check if backend has API key
         const statusRes = await fetch("/chat/status");
         const status = await statusRes.json();
@@ -105,10 +117,6 @@ export default function App() {
         } else {
           // Load Puter.js for fallback
           await loadPuterJS();
-          // Load tool definitions
-          const toolsRes = await fetch("/tools");
-          const toolsData = await toolsRes.json();
-          setTools(toolsData.tools || []);
           setAgentMode("puter");
         }
       } catch (error) {
@@ -340,6 +348,61 @@ After calling a tool, provide a brief helpful response about what you're showing
     }
   };
 
+  // Direct tool invocation
+  const invokeToolDirectly = async () => {
+    if (!selectedTool || loading) return;
+
+    setLoading(true);
+    setDirectWidget(null);
+
+    try {
+      // Parse tool arguments (convert empty strings to undefined so defaults are used)
+      const parsedArgs: Record<string, unknown> = {};
+      for (const [key, value] of Object.entries(toolArgs)) {
+        if (value.trim()) {
+          // Try to parse as JSON for complex types, otherwise use string
+          try {
+            parsedArgs[key] = JSON.parse(value);
+          } catch {
+            parsedArgs[key] = value;
+          }
+        }
+      }
+
+      const response = await fetch("/tools/call", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ name: selectedTool, arguments: parsedArgs }),
+      });
+
+      const data = await response.json();
+
+      if (data.error) {
+        throw new Error(data.error);
+      }
+
+      setDirectWidget({
+        html: data.html,
+        toolOutput: data.tool_output,
+        toolName: data.tool_name,
+      });
+    } catch (error) {
+      console.error("Tool invocation error:", error);
+      alert(error instanceof Error ? error.message : "Failed to invoke tool");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Get the selected tool's schema
+  const selectedToolSchema = tools.find((t) => t.function.name === selectedTool);
+
+  // Update tool args when selected tool changes
+  useEffect(() => {
+    setToolArgs({});
+    setDirectWidget(null);
+  }, [selectedTool]);
+
   const isDark = theme === "dark";
 
   // Show loading while checking status
@@ -393,7 +456,9 @@ After calling a tool, provide a brief helpful response about what you're showing
                     : "text-gray-400"
                 }`}
               >
-                {agentMode === "puter" ? (
+                {interactionMode === "direct" ? (
+                  "Direct Tool Mode"
+                ) : agentMode === "puter" ? (
                   <span className="flex items-center gap-1">
                     <Zap size={12} />
                     Puter.js (free, no API key)
@@ -405,50 +470,241 @@ After calling a tool, provide a brief helpful response about what you're showing
             </div>
           </div>
         </div>
-        <button
-          onClick={() => setTheme(isDark ? "light" : "dark")}
-          className={`p-2 rounded-lg transition-colors ${
-            isDark ? "hover:bg-gray-800 text-gray-400" : "hover:bg-gray-100 text-gray-600"
-          }`}
-          title={`Switch to ${isDark ? "light" : "dark"} mode`}
-        >
-          {isDark ? <Sun size={20} /> : <Moon size={20} />}
-        </button>
+        <div className="flex items-center gap-2">
+          {/* Mode toggle */}
+          <div
+            className={`flex rounded-lg border p-0.5 ${
+              isDark ? "border-gray-700 bg-gray-800" : "border-gray-200 bg-gray-100"
+            }`}
+          >
+            <button
+              onClick={() => setInteractionMode("chat")}
+              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-md text-sm transition-colors ${
+                interactionMode === "chat"
+                  ? isDark
+                    ? "bg-gray-700 text-white"
+                    : "bg-white text-gray-900 shadow-sm"
+                  : isDark
+                  ? "text-gray-400 hover:text-white"
+                  : "text-gray-500 hover:text-gray-900"
+              }`}
+              title="Chat with AI"
+            >
+              <MessageSquare size={16} />
+              Chat
+            </button>
+            <button
+              onClick={() => setInteractionMode("direct")}
+              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-md text-sm transition-colors ${
+                interactionMode === "direct"
+                  ? isDark
+                    ? "bg-gray-700 text-white"
+                    : "bg-white text-gray-900 shadow-sm"
+                  : isDark
+                  ? "text-gray-400 hover:text-white"
+                  : "text-gray-500 hover:text-gray-900"
+              }`}
+              title="Invoke tools directly"
+            >
+              <Wrench size={16} />
+              Direct
+            </button>
+          </div>
+          <button
+            onClick={() => setTheme(isDark ? "light" : "dark")}
+            className={`p-2 rounded-lg transition-colors ${
+              isDark ? "hover:bg-gray-800 text-gray-400" : "hover:bg-gray-100 text-gray-600"
+            }`}
+            title={`Switch to ${isDark ? "light" : "dark"} mode`}
+          >
+            {isDark ? <Sun size={20} /> : <Moon size={20} />}
+          </button>
+        </div>
       </header>
 
-      {/* Chat Area */}
+      {/* Main Content Area */}
       <div className="flex-1 overflow-y-auto">
-        <div className="max-w-3xl mx-auto px-4 py-6 space-y-6">
-          {messages.length === 0 && (
-            <div className="text-center py-12">
-              <h2 className={`text-2xl font-semibold mb-2 ${isDark ? "text-white" : "text-gray-900"}`}>
-                ChatGPT Widget Simulator
-              </h2>
-              <p className={`text-sm mb-2 ${isDark ? "text-gray-400" : "text-gray-500"}`}>
-                Test your widgets locally before deploying to ChatGPT
-              </p>
-              {agentMode === "puter" && (
-                <p className={`text-xs mb-6 ${isDark ? "text-green-400" : "text-green-600"}`}>
-                  Using Puter.js - no API key required!
-                </p>
-              )}
-              <div className="flex flex-wrap justify-center gap-2">
-                {EXAMPLE_PROMPTS.map((prompt) => (
-                  <button
-                    key={prompt}
-                    onClick={() => sendMessage(prompt)}
-                    className={`px-4 py-2 text-sm rounded-full transition-colors ${
-                      isDark
-                        ? "bg-gray-800 hover:bg-gray-700 text-gray-300 border border-gray-700"
-                        : "bg-white hover:bg-gray-50 text-gray-700 border border-gray-200"
-                    }`}
-                  >
-                    {prompt}
-                  </button>
-                ))}
+        {interactionMode === "direct" ? (
+          /* Direct Tool Mode */
+          <div className="max-w-4xl mx-auto px-4 py-6">
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+              {/* Tool Selection Panel */}
+              <div
+                className={`lg:col-span-1 rounded-2xl border p-4 ${
+                  isDark ? "border-gray-700 bg-gray-800" : "border-gray-200 bg-white"
+                }`}
+              >
+                <h3 className={`font-semibold mb-4 ${isDark ? "text-white" : "text-gray-900"}`}>
+                  Select Tool
+                </h3>
+
+                {/* Tool Dropdown */}
+                <select
+                  value={selectedTool}
+                  onChange={(e) => setSelectedTool(e.target.value)}
+                  className={`w-full p-2 rounded-lg border mb-4 ${
+                    isDark
+                      ? "bg-gray-700 border-gray-600 text-white"
+                      : "bg-gray-50 border-gray-200 text-gray-900"
+                  }`}
+                >
+                  <option value="">-- Select a tool --</option>
+                  {tools.map((tool) => (
+                    <option key={tool.function.name} value={tool.function.name}>
+                      {tool.function.name}
+                    </option>
+                  ))}
+                </select>
+
+                {/* Tool Description */}
+                {selectedToolSchema && (
+                  <p className={`text-sm mb-4 ${isDark ? "text-gray-400" : "text-gray-500"}`}>
+                    {selectedToolSchema.function.description.split("\n")[0]}
+                  </p>
+                )}
+
+                {/* Parameter Inputs */}
+                {selectedToolSchema && (
+                  <div className="space-y-3">
+                    <h4 className={`text-sm font-medium ${isDark ? "text-gray-300" : "text-gray-700"}`}>
+                      Parameters
+                    </h4>
+                    {Object.entries(selectedToolSchema.function.parameters.properties || {}).map(
+                      ([key, schema]) => {
+                        const prop = schema as { type?: string; description?: string; default?: unknown };
+                        return (
+                          <div key={key}>
+                            <label
+                              className={`block text-xs mb-1 ${isDark ? "text-gray-400" : "text-gray-500"}`}
+                            >
+                              {key}
+                              {prop.default !== undefined && (
+                                <span className="ml-1 opacity-60">
+                                  (default: {JSON.stringify(prop.default)})
+                                </span>
+                              )}
+                            </label>
+                            <input
+                              type="text"
+                              value={toolArgs[key] || ""}
+                              onChange={(e) =>
+                                setToolArgs((prev) => ({ ...prev, [key]: e.target.value }))
+                              }
+                              placeholder={prop.description || key}
+                              className={`w-full p-2 rounded-lg border text-sm ${
+                                isDark
+                                  ? "bg-gray-700 border-gray-600 text-white placeholder-gray-500"
+                                  : "bg-gray-50 border-gray-200 text-gray-900 placeholder-gray-400"
+                              }`}
+                            />
+                          </div>
+                        );
+                      }
+                    )}
+                  </div>
+                )}
+
+                {/* Invoke Button */}
+                <button
+                  onClick={invokeToolDirectly}
+                  disabled={!selectedTool || loading}
+                  className={`w-full mt-4 flex items-center justify-center gap-2 px-4 py-2 rounded-lg font-medium transition-colors ${
+                    selectedTool && !loading
+                      ? "bg-blue-600 text-white hover:bg-blue-700"
+                      : isDark
+                      ? "bg-gray-700 text-gray-500 cursor-not-allowed"
+                      : "bg-gray-200 text-gray-400 cursor-not-allowed"
+                  }`}
+                >
+                  <Play size={18} />
+                  {loading ? "Invoking..." : "Invoke Tool"}
+                </button>
+              </div>
+
+              {/* Widget Display Panel */}
+              <div
+                className={`lg:col-span-2 rounded-2xl border overflow-hidden ${
+                  isDark ? "border-gray-700 bg-gray-800" : "border-gray-200 bg-white"
+                }`}
+              >
+                {directWidget ? (
+                  <>
+                    <div
+                      className={`px-4 py-2 flex items-center justify-between border-b ${
+                        isDark ? "border-gray-700" : "border-gray-100"
+                      }`}
+                    >
+                      <span className={`text-sm font-medium ${isDark ? "text-gray-300" : "text-gray-600"}`}>
+                        {directWidget.toolName.replace("show_", "").replace(/_/g, " ")}
+                      </span>
+                      <button
+                        onClick={() => setExpandedWidget(directWidget)}
+                        className={`p-1.5 rounded-lg transition-colors ${
+                          isDark ? "hover:bg-gray-700 text-gray-400" : "hover:bg-gray-100 text-gray-500"
+                        }`}
+                        title="Expand"
+                      >
+                        <Maximize2 size={16} />
+                      </button>
+                    </div>
+                    <div className="h-[500px]">
+                      <WidgetRenderer
+                        html={directWidget.html}
+                        toolOutput={directWidget.toolOutput}
+                        theme={theme}
+                        onMessage={handleWidgetMessage}
+                      />
+                    </div>
+                  </>
+                ) : (
+                  <div className="h-[500px] flex items-center justify-center">
+                    <div className="text-center">
+                      <Wrench
+                        size={48}
+                        className={isDark ? "text-gray-600 mx-auto mb-3" : "text-gray-300 mx-auto mb-3"}
+                      />
+                      <p className={isDark ? "text-gray-500" : "text-gray-400"}>
+                        Select a tool and click "Invoke" to see the widget
+                      </p>
+                    </div>
+                  </div>
+                )}
               </div>
             </div>
-          )}
+          </div>
+        ) : (
+          /* Chat Mode */
+          <div className="max-w-3xl mx-auto px-4 py-6 space-y-6">
+            {messages.length === 0 && (
+              <div className="text-center py-12">
+                <h2 className={`text-2xl font-semibold mb-2 ${isDark ? "text-white" : "text-gray-900"}`}>
+                  ChatGPT Widget Simulator
+                </h2>
+                <p className={`text-sm mb-2 ${isDark ? "text-gray-400" : "text-gray-500"}`}>
+                  Test your widgets locally before deploying to ChatGPT
+                </p>
+                {agentMode === "puter" && (
+                  <p className={`text-xs mb-6 ${isDark ? "text-green-400" : "text-green-600"}`}>
+                    Using Puter.js - no API key required!
+                  </p>
+                )}
+                <div className="flex flex-wrap justify-center gap-2">
+                  {EXAMPLE_PROMPTS.map((prompt) => (
+                    <button
+                      key={prompt}
+                      onClick={() => sendMessage(prompt)}
+                      className={`px-4 py-2 text-sm rounded-full transition-colors ${
+                        isDark
+                          ? "bg-gray-800 hover:bg-gray-700 text-gray-300 border border-gray-700"
+                          : "bg-white hover:bg-gray-50 text-gray-700 border border-gray-200"
+                      }`}
+                    >
+                      {prompt}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            )}
 
           {messages.map((msg) => (
             <div key={msg.id} className="space-y-3">
@@ -536,11 +792,13 @@ After calling a tool, provide a brief helpful response about what you're showing
             </div>
           )}
 
-          <div ref={messagesEndRef} />
-        </div>
+            <div ref={messagesEndRef} />
+          </div>
+        )}
       </div>
 
-      {/* Input Area */}
+      {/* Input Area - only show in chat mode */}
+      {interactionMode === "chat" && (
       <div className={`border-t ${isDark ? "border-gray-700 bg-gray-900" : "border-gray-200 bg-white"}`}>
         <div className="max-w-3xl mx-auto px-4 py-4">
           <div
@@ -581,6 +839,7 @@ After calling a tool, provide a brief helpful response about what you're showing
           </p>
         </div>
       </div>
+      )}
 
       {/* Fullscreen Widget Modal */}
       {expandedWidget && (
