@@ -150,9 +150,9 @@ When customizing this template for your own app, follow the guidelines in [`docs
 ## Testing
 
 ```bash
-pnpm run test        # Run all 282 tests
-pnpm run test:server # Server tests only (82)
-pnpm run test:ui     # UI tests only (200)
+pnpm run test        # Run all tests
+pnpm run test:server # Server tests only
+pnpm run test:ui     # UI tests only
 ```
 
 **Tests are orthogonal to your app.** They verify:
@@ -162,6 +162,26 @@ pnpm run test:ui     # UI tests only (200)
 - React hooks work correctly
 
 They don't verify your specific widgets, data, or business logic. Modify anything - tests still pass.
+
+### MCP Best Practices Grade
+
+The test suite includes automated grading against [MCP server guidelines](docs/mcp-server-guidelines-for-ai-agents.md). After running tests, check `server/tests/mcp_best_practices_report.txt` for a grade report:
+
+```
+============================================================
+MCP BEST PRACTICES GRADE REPORT
+============================================================
+
+Tool Descriptions: 100.0%
+  ✓ Use cases documented: 100%
+  ✓ Arguments documented: 100%
+  ✓ Examples provided: 100%
+
+OVERALL SCORE: 99.6% (Grade: A)
+============================================================
+```
+
+When a check fails, the report includes a `FIX:` hint explaining exactly how to resolve it - useful for AI agents improving the server.
 
 ## Automated UI Testing (for AI Agents)
 

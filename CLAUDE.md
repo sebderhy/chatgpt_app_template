@@ -30,6 +30,7 @@ pnpm run ui-test --widget <name>  # Visual test a widget
 - **Input models:** All Pydantic `*Input` models MUST have `extra='forbid'` and defaults
 - **Theme support:** Widgets MUST work in both light and dark modes
 - **Test after changes:** ALWAYS run `pnpm run test` after any code change
+- **MCP best practices:** Tests grade the server against MCP guidelines (see `server/tests/mcp_best_practices_report.txt`)
 
 ## Documentation
 
