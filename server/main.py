@@ -699,6 +699,9 @@ Choose the right tool based on user intent:
 - **show_shop**: E-commerce cart interface. Use for shopping, checkout flows,
   or product quantity management.
 
+- **show_travel_map**: Interactive map with places of interest. Use for travel
+  planning, showing hotels/restaurants/attractions in a specific location.
+
 ### Important Notes
 
 - All widgets support both light and dark themes automatically
