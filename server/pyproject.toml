@@ -1,8 +1,7 @@
 [project]
 name = "chatgpt-app-server"
 version = "0.1.0"
-description = "Add your description here"
-readme = "README.md"
+description = "MCP server for ChatGPT App widgets"
 requires-python = ">=3.12"
 dependencies = [
     "fastapi>=0.115.0",
@@ -13,9 +12,12 @@ dependencies = [
     "uvicorn>=0.30.0",
 ]
 
-[dependency-groups]
+[project.optional-dependencies]
 dev = [
     "pytest>=8.0.0",
     "pytest-asyncio>=0.24.0",
     "pytest-cov>=4.1.0",
 ]
+
+[tool.setuptools]
+py-modules = ["main", "agent_runner"]
