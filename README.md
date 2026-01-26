@@ -313,6 +313,7 @@ Deploy the Python server to any platform (Fly.io, Render, Railway, Cloud Run, et
 
 ## Resources
 
+- [What Makes a Great ChatGPT App](https://developers.openai.com/blog/what-makes-a-great-chatgpt-app/) - OpenAI's official guidance (local copy: [docs/chatgpt-apps-development-guidelines.md](docs/chatgpt-apps-development-guidelines.md))
 - [Apps SDK Documentation](https://developers.openai.com/apps-sdk)
 - [MCP Protocol](https://modelcontextprotocol.io/)
 - [Apps SDK UI Components](https://openai.github.io/apps-sdk-ui/)
