@@ -106,6 +106,23 @@ export default function App() {
 
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
+  const pendingAutoInvoke = useRef<boolean>(false);
+  const argsFromUrl = useRef<boolean>(false);
+
+  // Parse URL parameters for direct widget loading
+  const getUrlParams = useCallback(() => {
+    const params = new URLSearchParams(window.location.search);
+    const widget = params.get("widget");
+    const tool = params.get("tool");
+    const args = params.get("args");
+    const urlTheme = params.get("theme");
+
+    return {
+      toolName: tool || (widget ? `show_${widget}` : null),
+      args: args ? JSON.parse(args) : null,
+      theme: urlTheme === "dark" || urlTheme === "light" ? urlTheme : null,
+    };
+  }, []);
 
   // Check API key status and load tools on mount
   useEffect(() => {
@@ -114,7 +131,36 @@ export default function App() {
         // Always load tool definitions (needed for direct mode)
         const toolsRes = await fetch("/tools");
         const toolsData = await toolsRes.json();
-        setTools(toolsData.tools || []);
+        const loadedTools = toolsData.tools || [];
+        setTools(loadedTools);
+
+        // Check for URL params and auto-configure
+        const urlParams = getUrlParams();
+        if (urlParams.theme) {
+          setTheme(urlParams.theme);
+        }
+        if (urlParams.toolName) {
+          // Validate tool exists
+          const toolExists = loadedTools.some(
+            (t: Tool) => t.function.name === urlParams.toolName
+          );
+          if (toolExists) {
+            setInteractionMode("direct");
+            setSelectedTool(urlParams.toolName);
+            if (urlParams.args) {
+              // Convert args to string format for form inputs
+              const stringArgs: Record<string, string> = {};
+              for (const [key, value] of Object.entries(urlParams.args)) {
+                stringArgs[key] = typeof value === "string" ? value : JSON.stringify(value);
+              }
+              setToolArgs(stringArgs);
+              // Mark to skip the clear effect
+              argsFromUrl.current = true;
+            }
+            // Mark for auto-invocation once agentMode is ready
+            pendingAutoInvoke.current = true;
+          }
+        }
 
         // Check if backend has API key
         const statusRes = await fetch("/chat/status");
@@ -135,7 +181,7 @@ export default function App() {
     };
 
     init();
-  }, []);
+  }, [getUrlParams]);
 
   // Load Puter.js script dynamically
   const loadPuterJS = (): Promise<void> => {
@@ -168,6 +214,18 @@ export default function App() {
       inputRef.current?.focus();
     }
   }, [agentMode]);
+
+  // Auto-invoke tool when loaded via URL parameters
+  useEffect(() => {
+    if (agentMode !== "checking" && pendingAutoInvoke.current && selectedTool) {
+      pendingAutoInvoke.current = false;
+      // Small delay to ensure state is settled
+      const timer = setTimeout(() => {
+        invokeToolDirectly();
+      }, 100);
+      return () => clearTimeout(timer);
+    }
+  }, [agentMode, selectedTool]);
 
   // Send message using Puter.js (free fallback)
   const sendMessagePuter = useCallback(async (text: string) => {
@@ -405,11 +463,56 @@ After calling a tool, provide a brief helpful response about what you're showing
   // Get the selected tool's schema
   const selectedToolSchema = tools.find((t) => t.function.name === selectedTool);
 
-  // Update tool args when selected tool changes
+  // Update tool args when selected tool changes (but not if args came from URL)
   useEffect(() => {
+    if (argsFromUrl.current) {
+      // Args were set from URL, don't clear them
+      argsFromUrl.current = false;
+      return;
+    }
     setToolArgs({});
     setDirectWidget(null);
   }, [selectedTool]);
+
+  // Sync state to URL (bidirectional URL <-> state sync)
+  useEffect(() => {
+    // Skip during initial load / auto-invoke
+    if (agentMode === "checking" || pendingAutoInvoke.current) return;
+
+    const params = new URLSearchParams();
+
+    // Only add params in direct mode with a selected tool
+    if (interactionMode === "direct" && selectedTool) {
+      // Use "widget" param if tool follows show_* pattern, otherwise "tool"
+      if (selectedTool.startsWith("show_")) {
+        params.set("widget", selectedTool.replace("show_", ""));
+      } else {
+        params.set("tool", selectedTool);
+      }
+
+      // Add args if any are set
+      const nonEmptyArgs = Object.fromEntries(
+        Object.entries(toolArgs).filter(([, v]) => v.trim() !== "")
+      );
+      if (Object.keys(nonEmptyArgs).length > 0) {
+        params.set("args", JSON.stringify(nonEmptyArgs));
+      }
+    }
+
+    // Add theme if dark
+    if (theme === "dark") {
+      params.set("theme", "dark");
+    }
+
+    // Update URL without reload
+    const queryString = params.toString();
+    const newSearch = queryString ? `?${queryString}` : "";
+
+    if (window.location.search !== newSearch) {
+      const newUrl = window.location.pathname + newSearch;
+      window.history.replaceState({}, "", newUrl);
+    }
+  }, [agentMode, interactionMode, selectedTool, toolArgs, theme]);
 
   const isDark = theme === "dark";
 
