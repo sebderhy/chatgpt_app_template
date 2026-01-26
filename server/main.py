@@ -1034,7 +1034,7 @@ async def handle_solar_system(widget: Widget, arguments: Dict[str, Any]) -> type
 
     structured_content = {
         "title": payload.title,
-        "planet_name": payload.planet_name,
+        "planet_name": payload.planet_name or "",  # Empty string instead of null
     }
 
     planet_msg = f" (focusing on {payload.planet_name})" if payload.planet_name else ""

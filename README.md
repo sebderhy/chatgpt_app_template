@@ -1,10 +1,10 @@
 # ChatGPT App Template
 
-A template for building ChatGPT Apps, designed to be edited seamlessly with Coding Agents (Claude Code, Codex, Cursor, etc.).
+**The AI-agent-first ChatGPT App template.** Built so coding agents (Claude Code, Codex, Cursor, ...) can modify, test, and go as far as possible autonomously - without human in the loop.
 
 ## Why This Template?
 
-**Build ChatGPT Apps with AI assistance.** This template is structured so that AI coding agents can modify, extend, and test your app without manual intervention:
+Most templates assume a human developer. This one is designed for AI agents:
 
 1. **Zero-config testing** - Simulator works instantly with no API key (free for dev/testing via [Puter.js](https://puter.com))
 2. **Automated UI testing** - AI agents can test widgets visually using Playwright screenshots
@@ -172,6 +172,10 @@ Browser tests run each widget in a real Chromium browser to verify:
 - Widget renders visible content
 - Works in both light and dark themes
 - No unhandled promise rejections
+- Images have alt text (accessibility)
+- No duplicate HTML IDs
+- Text contrast meets WCAG guidelines (warnings only)
+- Interactive elements are keyboard accessible (warnings only)
 
 **Setup (one-time):**
 ```bash
@@ -195,6 +199,9 @@ Grades against [MCP server guidelines](docs/mcp-development-guidelines.md) - too
 
 **ChatGPT App Guidelines** (`server/tests/chatgpt_app_guidelines_report.txt`):
 Grades against [OpenAI's app design guidance](docs/what-makes-a-great-chatgpt-app.md) - Know/Do/Show value, model-friendly outputs, ecosystem fit.
+
+**Output Quality** (`server/tests/output_quality_report.txt`):
+Grades tool output quality - response size limits, schema stability, null handling, ID consistency, boundary value handling.
 
 Example report:
 ```

@@ -34,6 +34,7 @@ pnpm run ui-test --widget <name>  # Visual test a widget
 - **Test after changes:** ALWAYS run `pnpm run test` after any code change
 - **MCP best practices:** Tests grade the server against MCP guidelines (run `pnpm run test` to generate `server/tests/mcp_best_practices_report.txt`)
 - **ChatGPT app guidelines:** Tests grade against OpenAI's app design guidance (generates `server/tests/chatgpt_app_guidelines_report.txt`)
+- **Output quality:** Tests grade tool output quality - schema stability, null handling, response size (generates `server/tests/output_quality_report.txt`)
 
 ## Documentation
 
@@ -63,7 +64,7 @@ No API key required - uses Puter.js fallback for testing.
 
 ## Browser Compliance Tests
 
-Browser tests (`tests/browser/widget-compliance.spec.ts`) run each widget in a real Chromium browser:
+Browser tests (`tests/browser/*.spec.ts`) run each widget in a real Chromium browser:
 
 | Test | What it catches |
 |------|-----------------|
@@ -71,6 +72,10 @@ Browser tests (`tests/browser/widget-compliance.spec.ts`) run each widget in a r
 | Renders content | Empty widgets, failed hydration |
 | Dark theme works | Theme-specific bugs, hardcoded colors |
 | No unhandled rejections | Async errors, failed API calls |
+| Images have alt text | Accessibility issues for screen readers |
+| No duplicate IDs | HTML validity issues |
+| Text contrast (warning) | WCAG AA contrast ratio violations |
+| Keyboard accessible (warning) | Missing tabindex or ARIA roles |
 
 Setup (one-time):
 ```bash
