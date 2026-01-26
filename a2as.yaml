@@ -1,0 +1,346 @@
+manifest:
+  version: "0.1.2"
+  schema: https://a2as.org/cert/schema
+  subject:
+    name: sebderhy/chatgpt-app-template
+    source: https://github.com/sebderhy/chatgpt-app-template
+    branch: main
+    commit: "8e0800b1"
+    scope: [server/agent_runner.py, server/main.py]
+  issued:
+    by: A2AS.org
+    at: '2026-01-26T16:11:14Z'
+  signatures:
+    digest: sha256:V6DiyuNLdY7TMQYsUTG97NT_8h3ClB9VrlGtnP4wWlg
+    key: ed25519:RlEDmFk9ZVFcnnlEM2NRRUo3tXHiXqHfrn6xU3RSJnI
+    sig: ed25519:Bvdh6LeHA3KBxsn9HD5t4uQPzFXzAvmWWlWrxaolDOY8ALIIesF-PWbC-6qCLeWOqM8S72ls5QIsw7_vQ94HCw
+
+agents:
+  agent:
+    type: instance
+    models: [MODEL]
+    mcp: [mcp_server]
+    params:
+      function: create_agent
+      name: Widget Assistant
+      model_settings: ModelSettings(tool_choice=auto)
+      instructions: [You are a helpful assistant that can display interactive widgets., 'When the user asks to see something
+          visual, use the appropriate tool:', '- show_card: For simple interactive card displays', '- show_carousel: For horizontal
+          scrolling cards (places, products, recommendations)', '- show_list: For vertical lists with thumbnails (rankings,
+          search results)', '- show_gallery: For image galleries with lightbox', '- show_dashboard: For stats and metrics
+          displays', '- show_solar_system: For interactive 3D solar system', '- show_todo: For task/todo list management',
+        '- show_shop: For shopping cart and e-commerce', 'Always use a tool when the user asks to see, show, or display something
+          visual.', 'After calling a tool, provide a brief helpful response about what you''re showing.']
+
+models:
+  MODEL:
+    type: variable
+    agents: [agent]
+
+mcp:
+  mcp_server:
+    type: process
+    agents: [agent]
+    params:
+      dynamic: "True"
+
+imports:
+  Agent: agents.Agent
+  annotations: __future__.annotations
+  Any: typing.Any
+  asyncio: asyncio
+  BaseModel: pydantic.BaseModel
+  clear_conversation: agent_runner.clear_conversation
+  ConfigDict: pydantic.ConfigDict
+  CORSMiddleware: starlette.middleware.cors.CORSMiddleware
+  dataclass: dataclasses.dataclass
+  deepcopy: copy.deepcopy
+  Dict: typing.Dict
+  FastMCP: mcp.server.fastmcp.FastMCP
+  Field: pydantic.Field
+  json: json
+  json_module: json
+  JSONResponse: starlette.responses.JSONResponse
+  List: typing.List
+  load_dotenv: dotenv.load_dotenv
+  MCPServerStreamableHttp: agents.mcp.MCPServerStreamableHttp
+  ModelSettings: agents.model_settings.ModelSettings
+  Optional: typing.Optional
+  os: os
+  Path: pathlib.Path
+  Request: starlette.requests.Request
+  Route: starlette.routing.Route
+  run_agent: agent_runner.run_agent
+  Runner: agents.Runner
+  StaticFiles: starlette.staticfiles.StaticFiles
+  traceback: traceback
+  types: mcp.types
+  uvicorn: uvicorn
+  ValidationError: pydantic.ValidationError
+  WidgetResult: agent_runner.WidgetResult
+  WIDGETS_BY_ID: main.WIDGETS_BY_ID
+
+functions:
+  __init__:
+    type: sync
+    module: server.agent_runner
+    args: [self]
+  _clear_html_cache:
+    type: sync
+    module: server.main
+    params:
+      returns: None
+  add_message:
+    type: sync
+    module: server.agent_runner
+    args: [self, conversation_id, role, content]
+  chat_endpoint:
+    type: async
+    module: server.main
+    args: [request]
+    params:
+      returns: JSONResponse
+  chat_status_endpoint:
+    type: async
+    module: server.main
+    args: [request]
+    params:
+      returns: JSONResponse
+  clear:
+    type: sync
+    module: server.agent_runner
+    args: [self, conversation_id]
+  clear_conversation:
+    type: sync
+    module: server.agent_runner
+    args: [conversation_id]
+  create_agent:
+    type: sync
+    module: server.agent_runner
+    args: [mcp_server]
+    params:
+      returns: Agent
+  create_mcp_server:
+    type: async
+    module: server.agent_runner
+    params:
+      returns: MCPServerStreamableHttp
+  create_widgets:
+    type: sync
+    module: server.main
+    params:
+      returns: List[Widget]
+  format_validation_error:
+    type: sync
+    module: server.main
+    args: [e, input_class]
+    params:
+      returns: str
+  get_base_url:
+    type: sync
+    module: server.main
+    params:
+      returns: str
+  get_history:
+    type: sync
+    module: server.agent_runner
+    args: [self, conversation_id]
+    params:
+      returns: List[Dict]
+  get_invocation_meta:
+    type: sync
+    module: server.main
+    args: [widget]
+    params:
+      returns: Dict
+  get_tool_meta:
+    type: sync
+    module: server.main
+    args: [widget]
+    params:
+      returns: Dict
+  get_tool_schema:
+    type: sync
+    module: server.main
+    args: [widget_id]
+    params:
+      returns: Dict
+  get_widget_html:
+    type: sync
+    module: server.agent_runner
+    args: [tool_name]
+    params:
+      returns: str
+  handle_call_tool:
+    type: async
+    module: server.main
+    args: [req]
+    params:
+      returns: types.ServerResult
+  handle_card:
+    type: async
+    module: server.main
+    args: [widget, arguments]
+    params:
+      returns: types.ServerResult
+  handle_carousel:
+    type: async
+    module: server.main
+    args: [widget, arguments]
+    params:
+      returns: types.ServerResult
+  handle_dashboard:
+    type: async
+    module: server.main
+    args: [widget, arguments]
+    params:
+      returns: types.ServerResult
+  handle_gallery:
+    type: async
+    module: server.main
+    args: [widget, arguments]
+    params:
+      returns: types.ServerResult
+  handle_list:
+    type: async
+    module: server.main
+    args: [widget, arguments]
+    params:
+      returns: types.ServerResult
+  handle_read_resource:
+    type: async
+    module: server.main
+    args: [req]
+    params:
+      returns: types.ServerResult
+  handle_shop:
+    type: async
+    module: server.main
+    args: [widget, arguments]
+    params:
+      returns: types.ServerResult
+  handle_solar_system:
+    type: async
+    module: server.main
+    args: [widget, arguments]
+    params:
+      returns: types.ServerResult
+  handle_todo:
+    type: async
+    module: server.main
+    args: [widget, arguments]
+    params:
+      returns: types.ServerResult
+  handle_travel_map:
+    type: async
+    module: server.main
+    args: [widget, arguments]
+    params:
+      returns: types.ServerResult
+  list_resource_templates:
+    type: async
+    module: server.main
+    params:
+      returns: List[types.ResourceTemplate]
+  list_resources:
+    type: async
+    module: server.main
+    params:
+      returns: List[types.Resource]
+  list_tools:
+    type: async
+    module: server.main
+    params:
+      returns: List[types.Tool]
+  load_config:
+    type: sync
+    module: server.agent_runner
+    params:
+      returns: dict
+  load_widget_html:
+    type: sync
+    module: server.main
+    args: [component_name]
+    params:
+      returns: str
+  reset_chat_endpoint:
+    type: async
+    module: server.main
+    args: [request]
+    params:
+      returns: JSONResponse
+  run_agent:
+    type: async
+    module: server.agent_runner
+    args: [prompt, conversation_id]
+    params:
+      returns: AgentResponse
+  test:
+    type: async
+    module: server.agent_runner
+  tool_call_endpoint:
+    type: async
+    module: server.main
+    args: [request]
+    params:
+      returns: JSONResponse
+  tools_list_endpoint:
+    type: async
+    module: server.main
+    args: [request]
+    params:
+      returns: JSONResponse
+
+variables:
+  BASE_URL:
+    type: env
+    params:
+      caller: [os.environ.get]
+      path: [env_path]
+  OPENAI_API_KEY:
+    type: env
+    params:
+      caller: [os.getenv]
+      path: [env_path]
+
+files:
+  ./:
+    type: pattern
+    actions: [read]
+    params:
+      patterns: ['{component_name}-*.html']
+      caller: [load_widget_html]
+  .env:
+    type: literal
+    actions: [read]
+    params:
+      path: [Path.parent]
+      caller: [chat_status_endpoint]
+  .html:
+    type: literal
+    actions: [read]
+    params:
+      caller: [load_widget_html]
+      path: [ASSETS_DIR]
+  ASSETS_DIR:
+    type: variable
+    actions: [read]
+    params:
+      caller: [ASSETS_DIR.glob]
+  config_path:
+    type: variable
+    actions: [read]
+    params:
+      caller: [open, json.load]
+      alias: [f]
+  html_path:
+    type: variable
+    actions: [read]
+    params:
+      caller: [html_path.read_text]
+  simulator_config.json:
+    type: literal
+    actions: [read]
+    params:
+      caller: [load_config]
+      path: [Path.parent]
