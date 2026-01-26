@@ -56,7 +56,7 @@ See [widget-development.md](./widget-development.md) for detailed patterns.
 
 ### Step 2: Register in Build System
 
-Edit `build-all.mts:6`:
+Edit `build-all.mts:18`:
 
 ```typescript
 const targets = [
@@ -173,6 +173,52 @@ Before deploying to ChatGPT, verify:
 - [ ] `pnpm run test` passes
 - [ ] `pnpm run ui-test` shows correct rendering
 - [ ] Tested in simulator with real prompts
+
+---
+
+## Finalizing Your App
+
+After building your widgets, clean up the template examples so only your app code remains.
+
+### Files to Remove
+
+**Widget source folders** (`src/`):
+- [ ] `boilerplate/`
+- [ ] `carousel/`
+- [ ] `list/`
+- [ ] `gallery/`
+- [ ] `dashboard/`
+- [ ] `solar-system/`
+- [ ] `todo/`
+- [ ] `shop/`
+- [ ] `travel-map/`
+
+**Build targets** (`build-all.mts:18`):
+- [ ] Remove example widget names from the `targets` array (keep only your widgets)
+
+**Server code** (`server/main.py`):
+- [ ] Remove example `*Input` classes (BoilerplateInput, CarouselInput, etc.)
+- [ ] Remove example Widget definitions from `create_widgets()`
+- [ ] Remove example entries from `WIDGET_INPUT_MODELS` dict
+- [ ] Remove example `handle_*` functions
+- [ ] Remove example routing in `handle_call_tool()`
+
+**Dependencies** (`package.json`):
+- [ ] Remove `three`, `@react-three/fiber`, `@react-three/drei`, `@react-three/postprocessing`, `@react-spring/three` if not using 3D
+- [ ] Remove `@types/three` from devDependencies if not using 3D
+- [ ] Remove any other unused dependencies
+
+### Final Verification
+
+After cleanup, run the full test suite to ensure nothing is broken:
+
+```bash
+pnpm install           # Update lockfile after dependency changes
+pnpm run build         # Build your widgets
+pnpm run test:all      # Run all tests (server, UI, browser)
+```
+
+All tests should still pass with only your widgets remaining.
 
 ---
 

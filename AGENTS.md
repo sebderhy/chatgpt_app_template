@@ -1,4 +1,4 @@
-# CLAUDE.md
+# AGENTS.md
 
 ChatGPT App template: React widgets + Python MCP server. Widgets render inside ChatGPT via the Apps SDK.
 
@@ -7,13 +7,15 @@ ChatGPT App template: React widgets + Python MCP server. Widgets render inside C
 ```bash
 ./setup.sh           # First-time setup (installs deps, builds, tests)
 pnpm run build       # Build widgets (REQUIRED before server)
-pnpm run test        # Run all tests (ALWAYS run after changes)
-pnpm run test:browser  # Run browser compliance tests (requires Playwright setup)
+pnpm run test        # Server + UI tests (run after every change)
+pnpm run test:all    # All tests including browser (requires Playwright)
 pnpm run server      # Start MCP server at localhost:8000
 pnpm run ui-test --widget <name>  # Visual test a widget
 ```
 
 **Workflow:** `pnpm run build && pnpm run test && pnpm run ui-test --widget <name>`
+
+**Thorough check:** `pnpm run build && pnpm run test:all`
 
 ## File Structure
 
@@ -22,8 +24,10 @@ pnpm run ui-test --widget <name>  # Visual test a widget
 | `src/{widget}/index.tsx` | Widget entry point |
 | `src/*.ts` | Shared hooks (useWidgetProps, useTheme) |
 | `server/main.py` | MCP server - tools and handlers |
-| `build-all.mts:6` | Widget targets (add new widgets here) |
+| `build-all.mts:18` | Widget targets (add new widgets here) |
+| `tests/*.test.ts` | UI unit tests (Vitest) |
 | `tests/browser/*.spec.ts` | Browser compliance tests (Playwright) |
+| `server/tests/test_*.py` | Server tests and grading (pytest) |
 
 ## Critical Rules
 
@@ -44,14 +48,27 @@ Read these before building:
 - `docs/what-makes-a-great-chatgpt-app.md` - Know/Do/Show framework, capability design, conversation patterns
 - `docs/widget-development.md` - Project-specific hooks (`useWidgetProps`, `useTheme`), patterns
 - `docs/mcp-development-guidelines.md` - MCP best practices (tool naming, descriptions, error handling)
+- `docs/openai-apps-sdk-llms.txt` - OpenAI Apps SDK index (lightweight map of all docs)
 - `docs/openai-apps-sdk-llms-full.txt` - Full OpenAI Apps SDK documentation
 
 ## Adding a Widget
 
 1. Create `src/my-widget/index.tsx` with React component
-2. Add `"my-widget"` to `build-all.mts:6`
+2. Add `"my-widget"` to `build-all.mts:18`
 3. Add Input model, Widget config, and handler in `server/main.py`
 4. Run `pnpm run build && pnpm run test && pnpm run ui-test --widget my-widget`
+
+## Finalizing Your App
+
+After building your widgets, remove the template examples:
+
+1. Delete example widget folders from `src/` (boilerplate, carousel, list, gallery, dashboard, solar-system, todo, shop, travel-map)
+2. Remove example entries from `build-all.mts:18` targets array
+3. Remove example Input models, Widget configs, and handlers from `server/main.py`
+4. Remove unused dependencies from `package.json` (e.g., `three`, `@react-three/*` if not using 3D)
+5. Run `pnpm install && pnpm run build && pnpm run test:all` to verify everything works
+
+See `docs/README.md` for the detailed cleanup checklist.
 
 ## Local Simulator
 

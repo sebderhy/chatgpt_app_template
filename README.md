@@ -160,10 +160,11 @@ When customizing this template for your own app, follow the guidelines in [`docs
 ## Testing
 
 ```bash
-pnpm run test          # Run all tests (server + UI)
+pnpm run test          # Server + UI tests (fast, run after every change)
+pnpm run test:all      # All tests including browser (requires Playwright)
 pnpm run test:server   # Server tests only
 pnpm run test:ui       # UI unit tests only
-pnpm run test:browser  # Browser compliance tests (requires Playwright)
+pnpm run test:browser  # Browser compliance tests only (requires Playwright)
 ```
 
 **Tests are orthogonal to your app.** They verify:
