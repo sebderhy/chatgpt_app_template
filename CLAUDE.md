@@ -39,10 +39,11 @@ pnpm run ui-test --widget <name>  # Visual test a widget
 
 Read these before building:
 
-- `docs/chatgpt-apps-development-guidelines.md` - What makes a great ChatGPT app (Know/Do/Show framework, capability design)
-- `docs/building-guide.md` - Detailed patterns, examples, and advanced workflows
-- `docs/mcp-server-guidelines-for-ai-agents.md` - MCP best practices (tool naming, descriptions, error handling)
-- `docs/openai_apps_sdk_docs.md` - OpenAI Apps SDK (display modes, UX guidelines)
+- `docs/README.md` - Step-by-step walkthrough for adding widgets (start here)
+- `docs/what-makes-a-great-chatgpt-app.md` - Know/Do/Show framework, capability design, conversation patterns
+- `docs/widget-development.md` - Project-specific hooks (`useWidgetProps`, `useTheme`), patterns
+- `docs/mcp-development-guidelines.md` - MCP best practices (tool naming, descriptions, error handling)
+- `docs/openai-apps-sdk-llms-full.txt` - Full OpenAI Apps SDK documentation
 
 ## Adding a Widget
 

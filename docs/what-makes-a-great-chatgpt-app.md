@@ -65,7 +65,7 @@ Your app presents information in a GUI that makes it more digestible or actionab
 1. **List core jobs-to-be-done** — What outcomes do users accomplish with your product?
    - Help someone choose a home
    - Turn raw data into a clear, shareable report
-   - Translate intent into a delighthat discovery experience
+   - Translate intent into a delightful discovery experience
 
 2. **For each job, ask:** "Without an app, what can't the user do within a ChatGPT conversation?"
    - Access live or private data?
@@ -115,10 +115,10 @@ create_support_ticket    → Open a ticket and return a summary + link
 #### No Brand Awareness (Cold Start)
 
 Your first response should:
-1. Explain your app's role in one line
+1. Explain your app's role in one line  
    *"I pull live listings and school ratings so you can compare options."*
 2. Deliver useful output right away
-3. Offer a clear next step
+3. Offer a clear next step  
    *"Ask me to narrow by commute, neighborhood, or budget."*
 
 ---

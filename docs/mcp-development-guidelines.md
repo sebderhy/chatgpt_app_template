@@ -1,4 +1,4 @@
-# MCP Server Development Guidelines for AI Coding Agents
+# MCP Server Development Guidelines
 
 > **Purpose**: This document provides actionable guidelines for building production-quality MCP (Model Context Protocol) servers. Follow these rules strictly.
 

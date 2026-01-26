@@ -1,0 +1,48 @@
+# Apps SDK
+
+> Build and ship ChatGPT apps with the Apps SDK (MCP-powered servers plus embeddable components).
+
+Use this as a lightweight map for AI tools. Each Apps SDK page has a Markdown twin at `/apps-sdk/<slug>.md` for direct ingestion.
+
+## Documentation sets
+- [Combined Apps SDK docs](https://developers.openai.com/apps-sdk/llms-full.txt): Single-file Markdown export of the Apps SDK preview docs.
+- [Apps SDK reference (Markdown)](https://developers.openai.com/apps-sdk/reference.md): Schema and API fields for tools, resources, and components.
+
+## App Submission Guidelines
+- [App submission guidelines](https://developers.openai.com/apps-sdk/app-submission-guidelines.md): Guidelines for submitting ChatGPT apps for publishing.
+
+## Build
+- [Authentication](https://developers.openai.com/apps-sdk/build/auth.md): Authentication patterns for Apps SDK apps.
+- [Build your ChatGPT UI](https://developers.openai.com/apps-sdk/build/chatgpt-ui.md): Build custom UI components for your ChatGPT app.
+- [Build your MCP server](https://developers.openai.com/apps-sdk/build/mcp-server.md): Wire tools, templates, and the widget runtime that powers ChatGPT Apps.
+- [Examples](https://developers.openai.com/apps-sdk/build/examples.md): End-to-end Apps SDK examples.
+- [Managing State](https://developers.openai.com/apps-sdk/build/state-management.md): How to manage business data, UI state, and cross-session state in ChatGPT apps using the Apps SDK and an MCP server.
+- [Monetization](https://developers.openai.com/apps-sdk/build/monetization.md): Monetize your ChatGPT app.
+
+## Concepts
+- [MCP](https://developers.openai.com/apps-sdk/concepts/mcp-server.md): Understand how the Model Context Protocol works with Apps SDK.
+- [UI guidelines](https://developers.openai.com/apps-sdk/concepts/ui-guidelines.md): Guidelines for designing beautiful ChatGPT apps.
+- [User Interaction](https://developers.openai.com/apps-sdk/concepts/user-interaction.md): How users find, engage with, activate and manage apps that are available in ChatGPT.
+- [UX principles](https://developers.openai.com/apps-sdk/concepts/ux-principles.md): Principles for building great ChatGPT apps.
+
+## Deploy
+- [Deploy your app](https://developers.openai.com/apps-sdk/deploy.md): Learn how to deploy your MCP server
+- [Connect from ChatGPT](https://developers.openai.com/apps-sdk/deploy/connect-chatgpt.md): Connect your app to ChatGPT clients.
+- [Submit your app](https://developers.openai.com/apps-sdk/deploy/submission.md): Learn how to submit your app to the ChatGPT Apps Directory.
+- [Test your integration](https://developers.openai.com/apps-sdk/deploy/testing.md): Testing strategies for Apps SDK apps.
+- [Troubleshooting](https://developers.openai.com/apps-sdk/deploy/troubleshooting.md): Troubleshoot issues in Apps SDK apps.
+
+## Guides
+- [Optimize Metadata](https://developers.openai.com/apps-sdk/guides/optimize-metadata.md): Improve discovery and behavior with rich metadata.
+- [Security & Privacy](https://developers.openai.com/apps-sdk/guides/security-privacy.md): Security and privacy considerations for Apps SDK.
+
+## Plan
+- [Define tools](https://developers.openai.com/apps-sdk/plan/tools.md): Plan and define tools for your assistant.
+- [Design components](https://developers.openai.com/apps-sdk/plan/components.md): Plan and design UI components that users can interact with.
+- [Research use cases](https://developers.openai.com/apps-sdk/plan/use-case.md): Identify and prioritize Apps SDK use cases.
+
+## Quickstart
+- [Quickstart](https://developers.openai.com/apps-sdk/quickstart.md): Build and connect your first app to ChatGPT.
+
+## Reference
+- [Reference](https://developers.openai.com/apps-sdk/reference.md): API and SDK reference for Apps SDK.
