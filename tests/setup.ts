@@ -2,19 +2,19 @@
  * Test setup file for Vitest.
  *
  * Provides mock implementations of window.openai and related globals
- * required for testing widgets outside of ChatGPT.
+ * required for testing widgets outside of MCP Apps hosts.
  */
 
 import { beforeEach, vi } from "vitest";
-import type { OpenAiGlobals, DisplayMode, Theme } from "../src/types";
+import type { HostGlobals, DisplayMode, Theme } from "../src/types";
 
 /**
  * Creates a mock window.openai object with sensible defaults.
  * Tests can override specific properties as needed.
  */
 export function createMockOpenAi(
-  overrides: Partial<OpenAiGlobals> = {}
-): OpenAiGlobals & {
+  overrides: Partial<HostGlobals> = {}
+): HostGlobals & {
   callTool: ReturnType<typeof vi.fn>;
   sendFollowUpMessage: ReturnType<typeof vi.fn>;
   openExternal: ReturnType<typeof vi.fn>;
@@ -65,9 +65,9 @@ beforeEach(() => {
 
 /**
  * Helper to dispatch the openai:set_globals event.
- * Use this to simulate ChatGPT updating globals.
+ * Use this to simulate the MCP Apps host updating globals.
  */
-export function dispatchSetGlobals(globals: Partial<OpenAiGlobals>): void {
+export function dispatchSetGlobals(globals: Partial<HostGlobals>): void {
   const event = new CustomEvent("openai:set_globals", {
     detail: { globals },
   });
@@ -77,7 +77,7 @@ export function dispatchSetGlobals(globals: Partial<OpenAiGlobals>): void {
 /**
  * Helper to update specific window.openai properties.
  */
-export function updateMockOpenAi(updates: Partial<OpenAiGlobals>): void {
+export function updateMockOpenAi(updates: Partial<HostGlobals>): void {
   Object.assign(window.openai, updates);
   dispatchSetGlobals(updates);
 }

@@ -1,16 +1,18 @@
-# ChatGPT App Template
+# MCP App Template
 
-**The AI-agent-first ChatGPT App template.** Built so coding agents (Claude Code, Codex, Cursor, ...) can modify, test, and go as far as possible autonomously - without human in the loop.
+**The AI-agent-first MCP App template.** Built so coding agents (Claude Code, Codex, Cursor, ...) can modify, test, and go as far as possible autonomously - without human in the loop.
+
+Works with any MCP Apps host: **Claude**, **ChatGPT**, **VS Code**, **Goose**, and more.
 
 ## Why This Template?
 
 Most templates assume a human developer. This one is designed for AI agents to work as much as possible autonomously:
 
 ### 1. Orthogonal Test Suite
-340 tests verify infrastructure (MCP compliance, SDK format, accessibility, browser rendering) - not your business logic. Modify widgets, change data, add features - tests should still pass. Automated grading generates reports with actionable `FIX:` hints and references to steer coding agents on what to change.
+340 tests verify infrastructure (MCP Apps compliance, protocol format, accessibility, browser rendering) - not your business logic. Modify widgets, change data, add features - tests should still pass. Automated grading generates reports with actionable `FIX:` hints and references to steer coding agents on what to change.
 
 ### 2. Hierarchical Documentation
-`AGENTS.md` for quick onboarding → `docs/README.md` for a step-by-step building guide → deep docs covering MCP best practices, widget patterns, and OpenAI's complete SDK reference (`llms-full.txt`).
+`AGENTS.md` for quick onboarding → `docs/README.md` for a step-by-step building guide → deep docs covering MCP best practices, widget patterns, and complete SDK reference (`llms-full.txt`).
 
 ### 3. Automated Visual Testing
 AI agents can test widgets and capture screenshots - no API key required:
@@ -20,7 +22,7 @@ pnpm run ui-test --widget carousel  # Renders widget, saves screenshot
 Agents read `/tmp/ui-test/screenshot.png` to verify their changes work.
 
 ### 4. Zero-Config Simulator
-Local ChatGPT simulator for manual testing - works instantly without API key via [Puter.js](https://puter.com). Add an OpenAI key for AI-in-the-loop testing.
+Local simulator for manual testing - works instantly without API key via [Puter.js](https://puter.com). Add an OpenAI key for AI-in-the-loop testing.
 
 ### 5. Working Examples
 9 production-ready widgets demonstrating state management, theming, 3D visualization, drag-and-drop, and more.
@@ -61,7 +63,7 @@ That's it! The simulator uses [Puter.js](https://puter.com) for free AI - no API
 
 ## Local Simulator
 
-The simulator lets you test widgets without deploying to ChatGPT. It works in two modes:
+The simulator lets you test widgets without deploying to a real MCP host. It works in two modes:
 
 ### Zero-Config Mode (No API Key)
 
@@ -78,7 +80,7 @@ The simulator automatically detects when no API key is configured and uses [Pute
 - Demos and presentations
 - Manual testing without credentials
 
-Note: Puter.js is only used in the local simulator. In production, your app connects to real ChatGPT which provides the AI - no Puter.js involved.
+Note: Puter.js is only used in the local simulator. In production, your app connects to real MCP hosts (Claude, ChatGPT, etc.) which provide the AI.
 
 ### Full Mode (With OpenAI API Key)
 
@@ -106,27 +108,45 @@ The simulator shows which mode is active in the header.
 | Feature | Description |
 |---------|-------------|
 | **Zero-config mode** | Works instantly without any API key |
-| **Inline widgets** | Widgets appear in chat just like real ChatGPT |
+| **Inline widgets** | Widgets appear in chat just like real MCP hosts |
 | **Expand to fullscreen** | Click the expand icon to view widgets fullscreen |
 | **Theme toggle** | Test light/dark mode |
-| **MCP protocol** | Uses the same protocol as real ChatGPT |
+| **MCP protocol** | Uses the same MCP Apps protocol as real hosts |
 
 Try prompts like *"Show me a carousel of restaurants"* or *"Display a dashboard"*
 
-## Test with Real ChatGPT
+## Test with Real MCP Hosts
+
+### Claude (Desktop or Web)
+
+1. Expose your local server: `ngrok http 8000 --host-header=rewrite`
+2. Add the ngrok URL as a custom connector in Claude settings
+3. Ask: *"Show me the boilerplate widget"*
+
+### ChatGPT
 
 1. Enable [Developer Mode](https://platform.openai.com/docs/guides/developer-mode)
 2. Run `ngrok http 8000 --host-header=rewrite`
 3. Add connector in ChatGPT Settings → Connectors (ngrok URL + `/mcp`)
 4. Ask: *"Show me the boilerplate widget"*
 
+### MCP Apps Basic Host
+
+For testing with the reference implementation:
+
+```bash
+git clone https://github.com/modelcontextprotocol/ext-apps
+cd ext-apps/examples/basic-host
+npm install && SERVERS='["http://localhost:8000"]' npm start
+```
+
 ## How It Works
 
 ```
-User Prompt → ChatGPT → MCP Tool Call → Python Server → Widget renders in ChatGPT
+User Prompt → MCP Host → MCP Tool Call → Python Server → Widget renders in host
 ```
 
-- **Widgets** (`src/`) - React/TypeScript UIs that render inside ChatGPT
+- **Widgets** (`src/`) - React/TypeScript UIs that render inside MCP hosts
 - **Server** (`server/main.py`) - Python MCP server that handles tool calls
 - **Simulator** (`src/simulator/`) - Local development UI with Puter.js fallback
 - **Assets** (`assets/`) - Built widget bundles (generated by `pnpm run build`)
@@ -168,8 +188,8 @@ pnpm run test:browser  # Browser compliance tests only (requires Playwright)
 ```
 
 **Tests are orthogonal to your app.** They verify:
-- MCP protocol compliance
-- OpenAI Apps SDK format requirements
+- MCP Apps protocol compliance
+- SDK format requirements
 - Build output structure
 - React hooks work correctly
 - Widgets render without errors in real browsers
@@ -208,8 +228,8 @@ The test suite includes automated grading against best practices. After running 
 **MCP Best Practices** (`server/tests/mcp_best_practices_report.txt`):
 Grades against [MCP server guidelines](docs/mcp-development-guidelines.md) - tool naming, descriptions, error handling.
 
-**ChatGPT App Guidelines** (`server/tests/chatgpt_app_guidelines_report.txt`):
-Grades against [OpenAI's app design guidance](docs/what-makes-a-great-chatgpt-app.md) - Know/Do/Show value, model-friendly outputs, ecosystem fit.
+**MCP App Guidelines** (`server/tests/mcp_app_guidelines_report.txt`):
+Grades against app design guidance - Know/Do/Show value, model-friendly outputs, ecosystem fit.
 
 **Output Quality** (`server/tests/output_quality_report.txt`):
 Grades tool output quality - response size limits, schema stability, null handling, ID consistency, boundary value handling.
@@ -217,7 +237,7 @@ Grades tool output quality - response size limits, schema stability, null handli
 Example report:
 ```
 ============================================================
-CHATGPT APP GUIDELINES GRADE REPORT
+MCP APP GUIDELINES GRADE REPORT
 ============================================================
 
 1. Value Proposition: 100.0%
@@ -341,16 +361,15 @@ Deploy the Python server to any platform (Fly.io, Render, Railway, Cloud Run, et
 
 ## Resources
 
-- [What Makes a Great ChatGPT App](https://developers.openai.com/blog/what-makes-a-great-chatgpt-app/) - OpenAI's official guidance (local copy: [docs/what-makes-a-great-chatgpt-app.md](docs/what-makes-a-great-chatgpt-app.md))
-- [Apps SDK Documentation](https://developers.openai.com/apps-sdk)
-- [MCP Protocol](https://modelcontextprotocol.io/)
+- [MCP Apps Protocol](https://modelcontextprotocol.io/docs/extensions/apps) - Official MCP Apps specification
+- [MCP Protocol](https://modelcontextprotocol.io/) - Model Context Protocol
+- [OpenAI Apps SDK](https://developers.openai.com/apps-sdk) - OpenAI's implementation
 - [Apps SDK UI Components](https://openai.github.io/apps-sdk-ui/)
-- [OpenAI Agents SDK](https://openai.github.io/openai-agents-python/)
 - [Puter.js](https://developer.puter.com/) - Powers the simulator's zero-config mode (free for dev/testing)
 
 ## Acknowledgments
 
-Based on [OpenAI's Apps SDK Examples](https://github.com/openai/openai-apps-sdk-examples).
+Based on [OpenAI's Apps SDK Examples](https://github.com/openai/openai-apps-sdk-examples) and the [MCP Apps Protocol](https://modelcontextprotocol.io/docs/extensions/apps).
 
 ## License
 

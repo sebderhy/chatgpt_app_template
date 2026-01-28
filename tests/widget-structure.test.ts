@@ -95,7 +95,7 @@ describe("Widget Directory Organization", () => {
     const requiredHooks = [
       "use-widget-props.ts",
       "use-widget-state.ts",
-      "use-openai-global.ts",
+      "use-host-global.ts",
     ];
 
     for (const hook of requiredHooks) {

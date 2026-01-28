@@ -1,7 +1,7 @@
 {
-  "name": "chatgpt-app-template",
+  "name": "mcp-app-template",
   "version": "1.0.0",
-  "description": "Boilerplate for building ChatGPT Apps with MCP server and React widgets",
+  "description": "Boilerplate for building MCP Apps with Python server and React widgets. Works with Claude, ChatGPT, VS Code, Goose, and any MCP Apps host.",
   "main": "src/boilerplate/index.tsx",
   "type": "module",
   "scripts": {
@@ -26,10 +26,12 @@
     "ui-test": "tsx scripts/ui-test.ts"
   },
   "keywords": [
-    "chatgpt",
     "mcp",
-    "apps-sdk",
-    "openai"
+    "mcp-apps",
+    "model-context-protocol",
+    "claude",
+    "chatgpt",
+    "widgets"
   ],
   "author": "",
   "license": "MIT",

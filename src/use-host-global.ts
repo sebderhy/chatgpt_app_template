@@ -2,21 +2,24 @@ import { useSyncExternalStore } from "react";
 import {
   SET_GLOBALS_EVENT_TYPE,
   SetGlobalsEvent,
-  type OpenAiGlobals,
+  type HostGlobals,
 } from "./types";
 
 /**
  * React hook to subscribe to a specific property from window.openai.
  * Automatically re-renders when the value changes.
  *
+ * Note: The window.openai interface is the standard MCP Apps protocol interface,
+ * used by all MCP Apps hosts (Claude, ChatGPT, VS Code, Goose).
+ *
  * @example
- * const theme = useOpenAiGlobal("theme"); // "light" | "dark" | null
- * const displayMode = useOpenAiGlobal("displayMode"); // "inline" | "fullscreen" | "pip" | null
- * const toolOutput = useOpenAiGlobal("toolOutput"); // Your structured content
+ * const theme = useHostGlobal("theme"); // "light" | "dark" | null
+ * const displayMode = useHostGlobal("displayMode"); // "inline" | "fullscreen" | "pip" | null
+ * const toolOutput = useHostGlobal("toolOutput"); // Your structured content
  */
-export function useOpenAiGlobal<K extends keyof OpenAiGlobals>(
+export function useHostGlobal<K extends keyof HostGlobals>(
   key: K
-): OpenAiGlobals[K] | null {
+): HostGlobals[K] | null {
   return useSyncExternalStore(
     (onChange) => {
       if (typeof window === "undefined") {

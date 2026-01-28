@@ -1,7 +1,7 @@
-import { useOpenAiGlobal } from "./use-openai-global";
+import { useHostGlobal } from "./use-host-global";
 
 /**
- * React hook to get the maximum height constraint from the ChatGPT host.
+ * React hook to get the maximum height constraint from the MCP Apps host.
  * Use this to prevent your widget from overflowing.
  *
  * @example
@@ -9,5 +9,5 @@ import { useOpenAiGlobal } from "./use-openai-global";
  * return <div style={{ maxHeight: maxHeight ?? undefined }}>...</div>;
  */
 export const useMaxHeight = (): number | null => {
-  return useOpenAiGlobal("maxHeight");
+  return useHostGlobal("maxHeight");
 };

@@ -1,9 +1,12 @@
 /**
- * TypeScript types for the ChatGPT Apps SDK window.openai interface.
- * These types define the contract between your widget and the ChatGPT host.
+ * TypeScript types for the MCP Apps protocol window.openai interface.
+ * These types define the contract between your widget and the MCP Apps host
+ * (Claude, ChatGPT, VS Code, Goose, or any MCP-compatible host).
+ *
+ * Reference: https://modelcontextprotocol.io/docs/extensions/apps
  */
 
-export type OpenAiGlobals<
+export type HostGlobals<
   ToolInput = UnknownObject,
   ToolOutput = UnknownObject,
   ToolResponseMetadata = UnknownObject,
@@ -30,7 +33,7 @@ export type OpenAiGlobals<
 };
 
 /**
- * API methods available on window.openai for interacting with ChatGPT.
+ * API methods available on window.openai for interacting with the MCP Apps host.
  */
 type API = {
   /** Call another MCP tool from within the widget */
@@ -103,17 +106,18 @@ export type CallTool = (
 export const SET_GLOBALS_EVENT_TYPE = "openai:set_globals";
 
 export class SetGlobalsEvent extends CustomEvent<{
-  globals: Partial<OpenAiGlobals>;
+  globals: Partial<HostGlobals>;
 }> {
   readonly type = SET_GLOBALS_EVENT_TYPE;
 }
 
 /**
- * Global window.openai object injected by ChatGPT for widget communication.
+ * Global window.openai object injected by the MCP Apps host for widget communication.
+ * Despite the "openai" name, this interface is used by all MCP Apps hosts.
  */
 declare global {
   interface Window {
-    openai: API & OpenAiGlobals;
+    openai: API & HostGlobals;
     /** Legacy API (deprecated, use window.openai) */
     webplus?: {
       requestDisplayMode?: RequestDisplayMode;

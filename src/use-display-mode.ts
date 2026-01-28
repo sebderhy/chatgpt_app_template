@@ -1,8 +1,8 @@
-import { useOpenAiGlobal } from "./use-openai-global";
+import { useHostGlobal } from "./use-host-global";
 import { type DisplayMode } from "./types";
 
 /**
- * React hook to get the current display mode.
+ * React hook to get the current display mode from the MCP Apps host.
  * - "inline": Default card view in the chat
  * - "fullscreen": Full screen view with composer overlay
  * - "pip": Picture-in-picture floating window
@@ -14,5 +14,5 @@ import { type DisplayMode } from "./types";
  * }
  */
 export const useDisplayMode = (): DisplayMode | null => {
-  return useOpenAiGlobal("displayMode");
+  return useHostGlobal("displayMode");
 };

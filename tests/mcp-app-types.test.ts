@@ -1,14 +1,14 @@
 /**
- * OpenAI Types and API Tests - Infrastructure tests for ChatGPT Apps SDK compliance.
+ * MCP Apps Types and API Tests - Infrastructure tests for MCP Apps protocol compliance.
  *
  * These tests verify that the TypeScript types and patterns follow
- * OpenAI's Apps SDK requirements without assuming business logic.
+ * the MCP Apps protocol requirements without assuming business logic.
  *
  * Key requirements verified:
- * 1. Type definitions cover all required OpenAI globals
+ * 1. Type definitions cover all required host globals
  * 2. API methods have correct signatures
  * 3. Event types are properly defined
- * 4. Display modes and themes match OpenAI spec
+ * 4. Display modes and themes match MCP Apps spec
  */
 
 import { describe, it, expect } from "vitest";
@@ -18,10 +18,10 @@ import path from "path";
 const typesPath = path.resolve("src/types.ts");
 const typesContent = fs.readFileSync(typesPath, "utf-8");
 
-describe("OpenAI Types Definition", () => {
-  describe("OpenAiGlobals type", () => {
-    it("exports OpenAiGlobals type", () => {
-      expect(typesContent).toMatch(/export\s+type\s+OpenAiGlobals/);
+describe("MCP Apps Types Definition", () => {
+  describe("HostGlobals type", () => {
+    it("exports HostGlobals type", () => {
+      expect(typesContent).toMatch(/export\s+type\s+HostGlobals/);
     });
 
     it("includes theme property", () => {
@@ -129,7 +129,6 @@ describe("OpenAI Types Definition", () => {
     });
 
     it("takes name and args parameters", () => {
-      // Should have (name: string, args: Record<string, unknown>)
       expect(typesContent).toMatch(/name:\s*string/);
       expect(typesContent).toMatch(/args:\s*Record<string,\s*unknown>/);
     });
@@ -169,6 +168,7 @@ describe("OpenAI Types Definition", () => {
     });
 
     it("event type is openai:set_globals", () => {
+      // Note: The event type name is part of the MCP Apps protocol
       expect(typesContent).toMatch(/["']openai:set_globals["']/);
     });
 
@@ -187,16 +187,8 @@ describe("OpenAI Types Definition", () => {
       expect(typesContent).toMatch(/interface\s+Window/);
     });
 
-    it("adds openai to Window", () => {
-      expect(typesContent).toMatch(/openai:\s*API\s*&\s*OpenAiGlobals/);
-    });
-
-    it("includes legacy webplus API", () => {
-      expect(typesContent).toMatch(/webplus\?:/);
-    });
-
-    it("includes legacy oai API", () => {
-      expect(typesContent).toMatch(/oai\?:/);
+    it("adds openai to Window with HostGlobals", () => {
+      expect(typesContent).toMatch(/openai:\s*API\s*&\s*HostGlobals/);
     });
 
     it("declares WindowEventMap for events", () => {
@@ -250,7 +242,7 @@ describe("OpenAI Types Definition", () => {
 
 describe("Hook Exports", () => {
   const hookFiles = [
-    "use-openai-global.ts",
+    "use-host-global.ts",
     "use-widget-props.ts",
     "use-widget-state.ts",
     "use-theme.ts",
@@ -266,15 +258,13 @@ describe("Hook Exports", () => {
   it.each(hookFiles)("hook file '%s' has default or named export", (file) => {
     const hookPath = path.resolve("src", file);
     const content = fs.readFileSync(hookPath, "utf-8");
-
-    // Should have export statement
     expect(content).toMatch(/export\s+(default\s+)?(function|const)/);
   });
 
-  describe("useOpenAiGlobal", () => {
+  describe("useHostGlobal", () => {
     it("uses useSyncExternalStore for reactivity", () => {
       const content = fs.readFileSync(
-        path.resolve("src/use-openai-global.ts"),
+        path.resolve("src/use-host-global.ts"),
         "utf-8"
       );
       expect(content).toMatch(/useSyncExternalStore/);
@@ -282,7 +272,7 @@ describe("Hook Exports", () => {
 
     it("subscribes to SET_GLOBALS_EVENT_TYPE", () => {
       const content = fs.readFileSync(
-        path.resolve("src/use-openai-global.ts"),
+        path.resolve("src/use-host-global.ts"),
         "utf-8"
       );
       expect(content).toMatch(/SET_GLOBALS_EVENT_TYPE/);
@@ -290,7 +280,7 @@ describe("Hook Exports", () => {
 
     it("handles SSR (typeof window check)", () => {
       const content = fs.readFileSync(
-        path.resolve("src/use-openai-global.ts"),
+        path.resolve("src/use-host-global.ts"),
         "utf-8"
       );
       expect(content).toMatch(/typeof\s+window/);
@@ -303,10 +293,8 @@ describe("Hook Exports", () => {
         path.resolve("src/use-widget-state.ts"),
         "utf-8"
       );
-      // Must use optional chaining because window.openai doesn't exist in MCP Apps hosts
-      // (only in ChatGPT/OpenAI environment). Without optional chaining, the hook
-      // crashes with "Cannot read properties of undefined (reading 'setWidgetState')"
-      // Pattern: window.openai?.setWidgetState?.(...) for full safety
+      // Must use optional chaining because window.openai doesn't exist in some MCP Apps hosts
+      // Without optional chaining, the hook crashes with "Cannot read properties of undefined"
       expect(content).toMatch(/window\.openai\?\.\s*setWidgetState\?\.\(/);
     });
 
@@ -315,7 +303,6 @@ describe("Hook Exports", () => {
         path.resolve("src/use-widget-state.ts"),
         "utf-8"
       );
-      // Should check if state is a function
       expect(content).toMatch(/typeof\s+state\s*===\s*["']function["']/);
     });
   });

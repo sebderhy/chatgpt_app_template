@@ -22,7 +22,7 @@ pnpm run ui-test --widget <name>  # Visual test a widget
 | Path | Purpose |
 |------|---------|
 | `src/{widget}/index.tsx` | Widget entry point |
-| `src/*.ts` | Shared hooks (useMcpApp, useWidgetProps, useTheme) |
+| `src/*.ts` | Shared hooks (useWidgetProps, useTheme, useHostGlobal) |
 | `server/main.py` | MCP server - tools and handlers |
 | `build-all.mts:18` | Widget targets (add new widgets here) |
 | `tests/*.test.ts` | UI unit tests (Vitest) |
@@ -45,8 +45,8 @@ pnpm run ui-test --widget <name>  # Visual test a widget
 Read these before building:
 
 - `docs/README.md` - Step-by-step walkthrough for adding widgets (start here)
-- `docs/what-makes-a-great-chatgpt-app.md` - Know/Do/Show framework, capability design, conversation patterns
-- `docs/widget-development.md` - Project-specific hooks (`useMcpApp`, `useWidgetProps`, `useTheme`), patterns
+- `docs/what-makes-a-great-chatgpt-app.md` - Know/Do/Show framework, capability design, conversation patterns (OpenAI guidance)
+- `docs/widget-development.md` - Project-specific hooks (`useWidgetProps`, `useTheme`, `useHostGlobal`), patterns
 - `docs/mcp-development-guidelines.md` - MCP best practices (tool naming, descriptions, error handling)
 - MCP Apps docs: https://modelcontextprotocol.io/docs/extensions/apps
 

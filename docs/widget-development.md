@@ -1,6 +1,6 @@
 # Widget Development Patterns
 
-This document covers the project-specific patterns and hooks for building widgets in this ChatGPT App Template.
+This document covers the project-specific patterns and hooks for building widgets in this MCP App Template.
 
 ---
 
@@ -11,8 +11,8 @@ Every widget follows this pattern:
 ```tsx
 // src/my-widget/index.tsx
 import { createRoot } from "react-dom/client";
-import { useWidgetProps } from "../useWidgetProps";
-import { useTheme } from "../useTheme";
+import { useWidgetProps } from "../use-widget-props";
+import { useTheme } from "../use-theme";
 
 interface MyWidgetProps {
   title: string;
@@ -42,10 +42,10 @@ createRoot(document.getElementById("my-widget-root")!).render(<MyWidget />);
 
 ### `useWidgetProps<T>()`
 
-Retrieves the structured content passed from the MCP server via `window.openai.toolOutput`.
+Retrieves the structured content passed from the MCP server via the host's `window.openai.toolOutput`.
 
 ```tsx
-// Widget receives data via window.openai.toolOutput
+// Widget receives data via the host interface
 const props = useWidgetProps<MyDataType>();
 
 // Props structure matches structuredContent from server
@@ -115,7 +115,7 @@ const theme = useTheme();
                            │
                            ▼
 ┌─────────────────────────────────────────────────────────────────┐
-│  ChatGPT Host                                                   │
+│  MCP Apps Host (Claude, ChatGPT, VS Code, Goose)                │
 │                                                                 │
 │  window.openai.toolOutput = structuredContent                   │
 │                          │                                      │
@@ -174,10 +174,11 @@ function handleClick(itemId: string) {
 ```
 src/
 ├── my-widget/
-│   └── index.tsx       # Widget entry point
-├── useWidgetProps.ts   # Shared hook for reading tool output
-├── useTheme.ts         # Shared hook for theme detection
-└── index.css           # Shared Tailwind styles
+│   └── index.tsx        # Widget entry point
+├── use-widget-props.ts  # Shared hook for reading tool output
+├── use-theme.ts         # Shared hook for theme detection
+├── use-host-global.ts   # Low-level hook for host globals
+└── index.css            # Shared Tailwind styles
 ```
 
 Each widget:

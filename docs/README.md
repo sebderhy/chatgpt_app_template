@@ -1,6 +1,6 @@
-# ChatGPT App Template - Docs Index
+# MCP App Template - Docs Index
 
-A step-by-step walkthrough for building widgets with this template. For detailed reference, see the specialized docs listed below.
+A step-by-step walkthrough for building widgets with this template. Works with any MCP Apps host (Claude, ChatGPT, VS Code, Goose, etc.).
 
 ---
 
@@ -8,11 +8,11 @@ A step-by-step walkthrough for building widgets with this template. For detailed
 
 | Document | What it covers |
 |----------|----------------|
-| [what-makes-a-great-chatgpt-app.md](./what-makes-a-great-chatgpt-app.md) | Know/Do/Show framework, capability design, conversation patterns |
-| [mcp-development-guidelines.md](./mcp-development-guidelines.md) | Tool naming, descriptions, error handling, security |
 | [widget-development.md](./widget-development.md) | Project-specific hooks (`useWidgetProps`, `useTheme`), patterns |
-| [openai-apps-sdk-llms.txt](./openai-apps-sdk-llms.txt) | Official OpenAI Apps SDK documentation index |
-| [openai-apps-sdk-llms-full.txt](./openai-apps-sdk-llms-full.txt) | Full OpenAI Apps SDK documentation |
+| [mcp-development-guidelines.md](./mcp-development-guidelines.md) | Tool naming, descriptions, error handling, security |
+| [what-makes-a-great-chatgpt-app.md](./what-makes-a-great-chatgpt-app.md) | Know/Do/Show framework, capability design (OpenAI guidance) |
+| [mcp-apps-docs.md](./mcp-apps-docs.md) | MCP Apps protocol specification |
+| [openai-apps-sdk-llms-full.txt](./openai-apps-sdk-llms-full.txt) | OpenAI Apps SDK documentation reference |
 
 ---
 
@@ -27,8 +27,8 @@ mkdir -p src/my-widget
 ```tsx
 // src/my-widget/index.tsx
 import { createRoot } from "react-dom/client";
-import { useWidgetProps } from "../useWidgetProps";
-import { useTheme } from "../useTheme";
+import { useWidgetProps } from "../use-widget-props";
+import { useTheme } from "../use-theme";
 
 interface MyWidgetProps {
   title: string;
@@ -153,7 +153,7 @@ pnpm run ui-test --widget my-widget
 
 ## Pre-Submission Checklist
 
-Before deploying to ChatGPT, verify:
+Before deploying to MCP Apps hosts, verify:
 
 ### MCP Server
 - [ ] Tool names use `verb_noun` format

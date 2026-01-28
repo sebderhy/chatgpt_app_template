@@ -47,7 +47,7 @@ function readFile(relativePath: string): string {
 // =============================================================================
 
 const HOOK_FILES = [
-  "use-openai-global.ts",
+  "use-host-global.ts",
   "use-widget-props.ts",
   "use-widget-state.ts",
   "use-theme.ts",
@@ -89,13 +89,13 @@ describe("MCP Apps Environment Compatibility", () => {
     });
   });
 
-  describe("useOpenAiGlobal hook specifics", () => {
+  describe("useHostGlobal hook specifics", () => {
     it("uses optional chaining in getSnapshot", () => {
-      expect(readFile("src/use-openai-global.ts")).toMatch(/window\.openai\?\.\[key\]/);
+      expect(readFile("src/use-host-global.ts")).toMatch(/window\.openai\?\.\[key\]/);
     });
 
     it("handles SSR with typeof window check", () => {
-      expect(readFile("src/use-openai-global.ts")).toMatch(
+      expect(readFile("src/use-host-global.ts")).toMatch(
         /typeof\s+window\s*===\s*["']undefined["']/
       );
     });

@@ -1,5 +1,5 @@
 /**
- * React Hooks Tests - Infrastructure tests for shared OpenAI integration hooks.
+ * React Hooks Tests - Infrastructure tests for shared MCP Apps integration hooks.
  *
  * These tests verify that the hooks correctly read from window.openai
  * and respond to changes, without assuming anything about widget business logic.
@@ -18,35 +18,35 @@ import { useWidgetState } from "../src/use-widget-state";
 import { useTheme } from "../src/use-theme";
 import { useDisplayMode } from "../src/use-display-mode";
 import { useMaxHeight } from "../src/use-max-height";
-import { useOpenAiGlobal } from "../src/use-openai-global";
+import { useHostGlobal } from "../src/use-host-global";
 import { createMockOpenAi, dispatchSetGlobals, updateMockOpenAi } from "./setup";
 
-describe("useOpenAiGlobal", () => {
+describe("useHostGlobal", () => {
   describe("reading values", () => {
     it("reads theme from window.openai", () => {
-      const { result } = renderHook(() => useOpenAiGlobal("theme"));
+      const { result } = renderHook(() => useHostGlobal("theme"));
       expect(result.current).toBe("light");
     });
 
     it("reads displayMode from window.openai", () => {
-      const { result } = renderHook(() => useOpenAiGlobal("displayMode"));
+      const { result } = renderHook(() => useHostGlobal("displayMode"));
       expect(result.current).toBe("inline");
     });
 
     it("reads maxHeight from window.openai", () => {
-      const { result } = renderHook(() => useOpenAiGlobal("maxHeight"));
+      const { result } = renderHook(() => useHostGlobal("maxHeight"));
       expect(result.current).toBe(600);
     });
 
     it("returns null for toolOutput when not set", () => {
-      const { result } = renderHook(() => useOpenAiGlobal("toolOutput"));
+      const { result } = renderHook(() => useHostGlobal("toolOutput"));
       expect(result.current).toBeNull();
     });
   });
 
   describe("responding to changes", () => {
     it("updates when globals change", async () => {
-      const { result } = renderHook(() => useOpenAiGlobal("theme"));
+      const { result } = renderHook(() => useHostGlobal("theme"));
       expect(result.current).toBe("light");
 
       act(() => {
@@ -64,7 +64,7 @@ describe("useOpenAiGlobal", () => {
       // Set toolOutput to undefined
       (window.openai as Record<string, unknown>).toolOutput = undefined;
 
-      const { result } = renderHook(() => useOpenAiGlobal("toolOutput"));
+      const { result } = renderHook(() => useHostGlobal("toolOutput"));
       expect(result.current).toBeNull();
     });
   });

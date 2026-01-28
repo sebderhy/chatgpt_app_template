@@ -1,7 +1,9 @@
 """
-ChatGPT App Boilerplate - Python MCP Server
+MCP App Template - Python MCP Server
 
-This server provides multiple widget templates:
+This server provides multiple widget templates that work with any MCP Apps host
+(Claude, ChatGPT, VS Code, Goose, etc.):
+
 - Boilerplate: Basic interactive widget
 - Carousel: Horizontal scrolling cards
 - List: Vertical list with thumbnails
@@ -40,7 +42,7 @@ if _env_path.exists():
 
 @dataclass(frozen=True)
 class Widget:
-    """Configuration for a widget that can be rendered in ChatGPT."""
+    """Configuration for a widget that can be rendered in MCP Apps hosts."""
     identifier: str
     title: str
     description: str
@@ -675,9 +677,9 @@ SAMPLE_MAP_PLACES = [
 # =============================================================================
 
 SERVER_INSTRUCTIONS = """
-## ChatGPT Widget Server Usage Guide
+## MCP App Widget Server Usage Guide
 
-This MCP server provides interactive widget tools for ChatGPT. Each tool displays
+This MCP server provides interactive widget tools for MCP Apps hosts. Each tool displays
 a specific type of visual content in the chat interface.
 
 ### Tool Selection Guide
@@ -1399,7 +1401,7 @@ if __name__ == "__main__":
     import uvicorn
 
     print("\n" + "=" * 60)
-    print("ChatGPT App Template - MCP Server")
+    print("MCP App Template - MCP Server")
     print("=" * 60)
     print("\nAvailable widgets:")
     for w in WIDGETS:

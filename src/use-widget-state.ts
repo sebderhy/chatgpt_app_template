@@ -1,9 +1,9 @@
 import { useCallback, useEffect, useState, type SetStateAction } from "react";
-import { useOpenAiGlobal } from "./use-openai-global";
+import { useHostGlobal } from "./use-host-global";
 import type { UnknownObject } from "./types";
 
 /**
- * React hook for persisting widget state on the ChatGPT host.
+ * React hook for persisting widget state on the MCP Apps host.
  * State survives tool calls and is restored when the widget re-renders.
  *
  * @example
@@ -21,7 +21,7 @@ export function useWidgetState<T extends UnknownObject>(
 export function useWidgetState<T extends UnknownObject>(
   defaultState?: T | (() => T | null) | null
 ): readonly [T | null, (state: SetStateAction<T | null>) => void] {
-  const widgetStateFromWindow = useOpenAiGlobal("widgetState") as T;
+  const widgetStateFromWindow = useHostGlobal("widgetState") as T;
 
   const [widgetState, _setWidgetState] = useState<T | null>(() => {
     if (widgetStateFromWindow != null) {
