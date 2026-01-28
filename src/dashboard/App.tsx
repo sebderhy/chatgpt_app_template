@@ -216,9 +216,9 @@ export default function App() {
 
   const handleRequestFullscreen = () => {
     if (window.openai?.requestDisplayMode) {
-      window.openai.requestDisplayMode({ mode: "fullscreen" });
+      window.openai?.requestDisplayMode({ mode: "fullscreen" });
     } else if (window.webplus?.requestDisplayMode) {
-      window.webplus.requestDisplayMode({ mode: "fullscreen" });
+      window.webplus?.requestDisplayMode({ mode: "fullscreen" });
     }
   };
 

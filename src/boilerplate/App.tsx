@@ -89,10 +89,10 @@ export default function App() {
   // Request fullscreen mode
   const handleRequestFullscreen = async () => {
     if (window.openai?.requestDisplayMode) {
-      await window.openai.requestDisplayMode({ mode: "fullscreen" });
+      await window.openai?.requestDisplayMode({ mode: "fullscreen" });
     } else if (window.webplus?.requestDisplayMode) {
       // Legacy API fallback
-      await window.webplus.requestDisplayMode({ mode: "fullscreen" });
+      await window.webplus?.requestDisplayMode({ mode: "fullscreen" });
     }
   };
 
@@ -108,7 +108,7 @@ export default function App() {
 
     try {
       // Replace "your-tool-name" with your actual tool name
-      const result = await window.openai.callTool("boilerplate_refresh", {
+      const result = await window.openai?.callTool("boilerplate_refresh", {
         message: "Refreshed from widget",
       });
       console.log("Tool result:", result);
@@ -126,7 +126,7 @@ export default function App() {
       return;
     }
 
-    await window.openai.sendFollowUpMessage({
+    await window.openai?.sendFollowUpMessage({
       prompt: "Tell me more about this widget",
     });
   };
