@@ -101,7 +101,7 @@ const PUTER_MODEL = "gpt-4o-mini"; // Free model via Puter.js
 // UUID generator with fallback for non-secure contexts (HTTP on public IP)
 function uid(): string {
   if (typeof crypto !== "undefined" && crypto.randomUUID) {
-    return uid();
+    return crypto.randomUUID();
   }
   return (Date.now().toString(36) + Math.random().toString(36).slice(2, 10)).toUpperCase();
 }

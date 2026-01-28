@@ -188,19 +188,27 @@ test("apptester loads and renders widgets", async () => {
     // 8. STRICT CHECK: Fail if any widget resources failed to load
     expect(failedResources, `Widget resources failed to load: ${failedResources.join(', ')}`).toHaveLength(0);
 
-    // 9. Check iframe exists and has content
-    const iframe = page.frameLocator('iframe[title*="MCP"], iframe[sandbox*="allow-scripts"]').first();
+    // 9. Navigate the double-iframe structure required by MCP Apps protocol:
+    //    Page → outer iframe (sandbox-proxy on port 8001) → inner iframe (widget)
+    const outerFrame = page.frameLocator('iframe[title*="MCP"]').first();
+    const widgetFrame = outerFrame.frameLocator('iframe').first();
 
-    // 9. Verify widget rendered something (not blank)
+    // 10. Verify widget rendered something (not blank)
     // Look for common widget elements: text, images, buttons, divs with content
     const hasContent = await Promise.race([
-      iframe.locator('body').textContent().then((text) => (text?.trim().length || 0) > 10),
-      iframe.locator('img').count().then((count) => count > 0),
-      iframe.locator('button').count().then((count) => count > 0),
-      iframe.locator('[class*="card"], [class*="item"], article').count().then((count) => count > 0),
+      widgetFrame.locator('body').textContent().then((text) => (text?.trim().length || 0) > 10),
+      widgetFrame.locator('img').count().then((count) => count > 0),
+      widgetFrame.locator('button').count().then((count) => count > 0),
+      widgetFrame.locator('[class*="card"], [class*="item"], article').count().then((count) => count > 0),
     ]);
 
     expect(hasContent).toBeTruthy();
+
+    // 11. Fail on console errors (filters out noise like React DevTools)
+    const realErrors = consoleErrors.filter(
+      (e) => !e.includes("React DevTools") && !e.includes("Download the React DevTools")
+    );
+    expect(realErrors, `Console errors:\n${realErrors.join("\n")}`).toHaveLength(0);
 
     await context.close();
   } finally {
