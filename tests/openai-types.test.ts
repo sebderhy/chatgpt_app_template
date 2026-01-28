@@ -298,12 +298,16 @@ describe("Hook Exports", () => {
   });
 
   describe("useWidgetState", () => {
-    it("calls setWidgetState to sync with host", () => {
+    it("calls setWidgetState with optional chaining for MCP Apps compatibility", () => {
       const content = fs.readFileSync(
         path.resolve("src/use-widget-state.ts"),
         "utf-8"
       );
-      expect(content).toMatch(/window\.openai\.setWidgetState/);
+      // Must use optional chaining because window.openai doesn't exist in MCP Apps hosts
+      // (only in ChatGPT/OpenAI environment). Without optional chaining, the hook
+      // crashes with "Cannot read properties of undefined (reading 'setWidgetState')"
+      // Pattern: window.openai?.setWidgetState?.(...) for full safety
+      expect(content).toMatch(/window\.openai\?\.\s*setWidgetState\?\.\(/);
     });
 
     it("supports functional updates", () => {

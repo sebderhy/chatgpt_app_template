@@ -45,13 +45,14 @@ export function useWidgetState<T extends UnknownObject>(
         const newState = typeof state === "function" ? state(prevState) : state;
 
         if (newState != null) {
-          window.openai.setWidgetState(newState);
+          window.openai?.setWidgetState?.(newState);
         }
 
         return newState;
       });
     },
-    [window.openai.setWidgetState]
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    []
   );
 
   return [widgetState, setWidgetState] as const;

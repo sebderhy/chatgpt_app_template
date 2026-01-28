@@ -165,4 +165,5 @@ class TestAssetsDirectory:
         """MIME_TYPE is correct for MCP Apps."""
         from main import MIME_TYPE
 
-        assert MIME_TYPE == "text/html"
+        # MCP Apps require the profile parameter to signal this is an MCP App resource
+        assert MIME_TYPE == "text/html;profile=mcp-app"

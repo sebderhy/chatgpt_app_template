@@ -52,7 +52,8 @@ class Widget:
 
 ASSETS_DIR = Path(__file__).resolve().parent.parent / "assets"
 # MCP Apps MIME type for UI resources
-MIME_TYPE = "text/html"
+# The profile parameter signals this is an MCP App resource
+MIME_TYPE = "text/html;profile=mcp-app"
 
 
 # =============================================================================
@@ -721,15 +722,47 @@ Choose the right tool based on user intent:
 mcp = FastMCP(name="boilerplate-server", instructions=SERVER_INSTRUCTIONS, stateless_http=True)
 
 
+# External CDN domains used by the template widgets
+# Add any external domains your widgets need for images, fonts, or API calls
+EXTERNAL_RESOURCE_DOMAINS: List[str] = [
+    "https://cdn.openai.com",           # Fonts from @openai/apps-sdk-ui
+    "https://images.unsplash.com",      # Sample images in demo widgets
+    "https://persistent.oaistatic.com", # Sample images in demo widgets
+]
+
+
+def get_csp_domains() -> Dict[str, List[str]]:
+    """Return CSP domains based on the current BASE_URL.
+
+    This allows the MCP App sandbox to load external assets (JS, CSS, images)
+    from our server and from external CDNs.
+    """
+    base_url = get_base_url()
+    # Extract origin from base URL (e.g., "http://localhost:8000" from "http://localhost:8000/assets")
+    from urllib.parse import urlparse
+    parsed = urlparse(base_url)
+    origin = f"{parsed.scheme}://{parsed.netloc}"
+
+    # Combine server origin with external CDN domains
+    resource_domains = [origin] + EXTERNAL_RESOURCE_DOMAINS
+
+    return {
+        "resourceDomains": resource_domains,  # For scripts, styles, images, fonts
+        "connectDomains": [origin],           # For fetch/XHR requests (add external APIs here if needed)
+    }
+
+
 def get_tool_meta(widget: Widget) -> Dict[str, Any]:
     """Return MCP Apps metadata for a tool.
 
     The key field is `ui.resourceUri` which links the tool to its UI resource.
+    The `csp` field specifies Content Security Policy domains for the sandbox.
     This follows the MCP Apps protocol specification.
     """
     return {
         "ui": {
             "resourceUri": widget.template_uri,
+            "csp": get_csp_domains(),
         },
     }
 
@@ -739,6 +772,7 @@ def get_invocation_meta(widget: Widget) -> Dict[str, Any]:
     return {
         "ui": {
             "resourceUri": widget.template_uri,
+            "csp": get_csp_domains(),
         },
     }
 
